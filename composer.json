@@ -1,0 +1,44 @@
+{
+    "name": "angellco/print-shop",
+    "description": "Everything you need to build a print shop with Craft Commerce 2.",
+    "type": "craft-plugin",
+    "version": "2.0.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "print shop"
+    ],
+    "support": {
+        "docs": "https://github.com/angell-co/print-shop/blob/master/README.md",
+        "issues": "https://github.com/angell-co/print-shop/issues"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Angell & Co",
+            "homepage": "https://angell.io"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.0.0-RC1"
+    },
+    "autoload": {
+        "psr-4": {
+          "angellco\\printshop\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Print Shop",
+        "handle": "print-shop",
+        "hasCpSettings": true,
+        "hasCpSection": false,
+        "changelogUrl": "https://raw.githubusercontent.com/angell-co/print-shop/master/CHANGELOG.md",
+        "components": {
+            "files": "angellco\\printshop\\services\\Files",
+            "proofs": "angellco\\printshop\\services\\Proofs"
+        },
+        "class": "angellco\\printshop\\PrintShop"
+    }
+}
