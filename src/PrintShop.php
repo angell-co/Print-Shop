@@ -27,6 +27,8 @@ use craft\web\twig\variables\CraftVariable;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUrlRulesEvent;
 
+use craft\commerce\Plugin as Commerce;
+
 use yii\base\Event;
 
 /**
@@ -49,6 +51,11 @@ class PrintShop extends Plugin
      */
     public static $plugin;
 
+    /**
+     * @var \craft\commerce\Plugin
+     */
+    public static $commerce;
+
     // Public Properties
     // =========================================================================
 
@@ -67,6 +74,7 @@ class PrintShop extends Plugin
     {
         parent::init();
         self::$plugin = $this;
+        self::$commerce = Commerce::getInstance();
 
 //        Event::on(
 //            Fields::class,
