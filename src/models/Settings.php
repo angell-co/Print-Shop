@@ -28,7 +28,22 @@ class Settings extends Model
     /**
      * @var string
      */
-    public $someAttribute = 'Some Default';
+    public $filesVolumeUid;
+
+    /**
+     * @var string
+     */
+    public $filesVolumeSubpath;
+
+    /**
+     * @var string
+     */
+    public $proofsVolumeUid;
+
+    /**
+     * @var string
+     */
+    public $proofsVolumeSubpath;
 
     // Public Methods
     // =========================================================================
@@ -39,8 +54,10 @@ class Settings extends Model
     public function rules()
     {
         return [
-            ['someAttribute', 'string'],
-            ['someAttribute', 'default', 'value' => 'Some Default'],
+            ['filesVolumeUid', 'string'],
+            ['filesVolumeSubpath', 'string'],
+            ['proofsVolumeUid', 'string'],
+            ['proofsVolumeSubpath', 'string'],
         ];
     }
 }
