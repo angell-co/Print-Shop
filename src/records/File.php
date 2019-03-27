@@ -30,6 +30,6 @@ class File extends ActiveRecord
      */
     public static function tableName()
     {
-        return '{{%printshop_file}}';
+        return '{{%printshop_files}}';
     }
 }

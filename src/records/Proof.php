@@ -30,6 +30,6 @@ class Proof extends ActiveRecord
      */
     public static function tableName()
     {
-        return '{{%printshop_proof}}';
+        return '{{%printshop_proofs}}';
     }
 }
