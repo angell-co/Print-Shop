@@ -13,7 +13,9 @@ namespace angellco\printshop\records;
 use angellco\printshop\PrintShop;
 
 use Craft;
+use craft\commerce\records\LineItem;
 use craft\db\ActiveRecord;
+use craft\records\Asset;
 
 /**
  * @author    Angell & Co
@@ -22,7 +24,7 @@ use craft\db\ActiveRecord;
  */
 class File extends ActiveRecord
 {
-    // Public Static Methods
+    // Public Methods
     // =========================================================================
 
     /**
@@ -32,4 +34,25 @@ class File extends ActiveRecord
     {
         return '{{%printshop_files}}';
     }
+
+    /**
+     * Returns the associated asset.
+     *
+     * @return ActiveQueryInterface The relational query object.
+     */
+    public function getAsset(): ActiveQueryInterface
+    {
+        return $this->hasOne(Asset::class, ['id' => 'assetId']);
+    }
+
+    /**
+     * Returns the associated line item.
+     *
+     * @return ActiveQueryInterface The relational query object.
+     */
+    public function getLineItem(): ActiveQueryInterface
+    {
+        return $this->hasOne(LineItem::class, ['id' => 'lineItemId']);
+    }
+
 }
