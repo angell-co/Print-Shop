@@ -18,6 +18,7 @@ use angellco\printshop\fields\PrintShopField as PrintShopFieldField;
 
 use Craft;
 use craft\base\Plugin;
+use craft\helpers\UrlHelper;
 use craft\services\Plugins;
 use craft\events\PluginEvent;
 use craft\web\UrlManager;
@@ -67,31 +68,13 @@ class PrintShop extends Plugin
         parent::init();
         self::$plugin = $this;
 
-        Event::on(
-            UrlManager::class,
-            UrlManager::EVENT_REGISTER_SITE_URL_RULES,
-            function (RegisterUrlRulesEvent $event) {
-                $event->rules['siteActionTrigger1'] = 'print-shop/files';
-                $event->rules['siteActionTrigger2'] = 'print-shop/proofs';
-            }
-        );
-
-        Event::on(
-            UrlManager::class,
-            UrlManager::EVENT_REGISTER_CP_URL_RULES,
-            function (RegisterUrlRulesEvent $event) {
-                $event->rules['cpActionTrigger1'] = 'print-shop/files/do-something';
-                $event->rules['cpActionTrigger2'] = 'print-shop/proofs/do-something';
-            }
-        );
-
-        Event::on(
-            Fields::class,
-            Fields::EVENT_REGISTER_FIELD_TYPES,
-            function (RegisterComponentTypesEvent $event) {
-                $event->types[] = PrintShopFieldField::class;
-            }
-        );
+//        Event::on(
+//            Fields::class,
+//            Fields::EVENT_REGISTER_FIELD_TYPES,
+//            function (RegisterComponentTypesEvent $event) {
+//                $event->types[] = PrintShopFieldField::class;
+//            }
+//        );
 
         Event::on(
             CraftVariable::class,
@@ -108,6 +91,11 @@ class PrintShop extends Plugin
             Plugins::EVENT_AFTER_INSTALL_PLUGIN,
             function (PluginEvent $event) {
                 if ($event->plugin === $this) {
+                    // Redirect to settings
+                    $request = Craft::$app->getRequest();
+                    if ($request->isCpRequest) {
+                        Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('settings/plugins/print-shop'))->send();
+                    }
                 }
             }
         );
