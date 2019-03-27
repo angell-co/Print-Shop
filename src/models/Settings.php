@@ -54,10 +54,22 @@ class Settings extends Model
     public function rules()
     {
         return [
-            ['filesVolumeUid', 'string'],
-            ['filesVolumeSubpath', 'string'],
-            ['proofsVolumeUid', 'string'],
-            ['proofsVolumeSubpath', 'string'],
+            [
+                [
+                    'filesVolumeUid',
+                    'filesVolumeSubpath',
+                    'proofsVolumeUid',
+                    'proofsVolumeSubpath'
+                ],
+                'string'
+            ],
+            [
+                [
+                    'filesVolumeUid',
+                    'proofsVolumeUid',
+                ],
+                'required'
+            ],
         ];
     }
 }
