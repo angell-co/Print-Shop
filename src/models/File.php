@@ -16,6 +16,10 @@ use Craft;
 use craft\base\Model;
 
 /**
+ * @property int $id ID
+ * @property int $assetId Asset ID
+ * @property int $lineItemId LineItem ID
+ *
  * @author    Angell & Co
  * @package   PrintShop
  * @since     2.0.0
@@ -26,21 +30,50 @@ class File extends Model
     // =========================================================================
 
     /**
-     * @var string
+     * @var int ID
      */
-    public $someAttribute = 'Some Default';
+    public $id;
+
+    /**
+     * @var int Asset ID
+     */
+    public $assetId;
+
+    /**
+     * @var int LineItem ID
+     */
+    public $lineItemId;
 
     // Public Methods
     // =========================================================================
+
+    /**
+     * Returns the asset set on the model
+     *
+     * @return \craft\elements\Asset|null
+     */
+    public function getAsset()
+    {
+        return Craft::$app->getAssets()->getAssetById($this->assetId);
+    }
+
+    /**
+     * Returns the line item set on the model
+     *
+     * @return \craft\commerce\models\LineItem|null
+     */
+    public function getLineItem()
+    {
+        return PrintShop::$commerce->getLineItems()->getLineItemById($this->lineItemId);
+    }
 
     /**
      * @inheritdoc
      */
     public function rules()
     {
-        return [
-            ['someAttribute', 'string'],
-            ['someAttribute', 'default', 'value' => 'Some Default'],
-        ];
+        $rules = parent::rules();
+        $rules[] = [['id', 'assetId', 'lineItemId'], 'number', 'integerOnly' => true];
+        return $rules;
     }
 }
