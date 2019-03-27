@@ -16,6 +16,11 @@ use Craft;
 use craft\base\Model;
 
 /**
+ * @property string $filesVolumeUid
+ * @property string $filesVolumeSubpath
+ * @property string $proofsVolumeUid
+ * @property string $proofsVolumeSubpath
+ *
  * @author    Angell & Co
  * @package   PrintShop
  * @since     2.0.0
