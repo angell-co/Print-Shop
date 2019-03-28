@@ -51,6 +51,7 @@ class FilesController extends Controller
     {
         $this->requirePostRequest();
         $this->requireAcceptsJson();
+        $assets = Craft::$app->getAssets();
         $lineItemId = Craft::$app->getRequest()->getRequiredParam('lineItemId');
 
         // Get the plugin settings so we have access to the volume info
@@ -58,8 +59,6 @@ class FilesController extends Controller
         $settings = PrintShop::$plugin->getSettings();
         $filesVolumeId = Db::idByUid('{{%volumes}}', $settings->filesVolumeUid);
 
-
-        $assets = Craft::$app->getAssets();
 
         /**
          * Make a folder for the order using the order hash
@@ -146,37 +145,11 @@ class FilesController extends Controller
         $file->assetId = $asset->id;
         $file->lineItemId = $lineItemId;
 
-        // TODO make the file service
+        if (!PrintShop::$plugin->files->saveFile($file)) {
+            return $this->asErrorJson(Craft::t('print-shop', 'Sorry there was a problem, please try again.'));
+        }
 
-        Craft::dd($file);
-
-//        $success = craft()->orderAssets_files->saveOrderAssetFile($model);
-//        if ($success)
-//        {
-//            if (craft()->request->isAjaxRequest)
-//            {
-//                $this->returnJson(array(
-//                    'success' => true,
-//                    'message' => Craft::t('File uploaded.'),
-//                    'file'    => $model
-//                ));
-//            }
-//
-//            craft()->userSession->setNotice(Craft::t('File uploaded.'));
-//            $this->redirectToPostedUrl();
-//        }
-//        else
-//        {
-//            if (craft()->request->isAjaxRequest)
-//            {
-//                $this->returnJson(array(
-//                    'success' => false,
-//                    'message' => Craft::t('Sorry there was a problem, please try again.'),
-//                ));
-//            }
-//            craft()->userSession->setError(Craft::t('Sorry there was a problem, please try again.'));
-//        }
-
+        return $this->asJson(['success' => true, 'file' => $file]);
     }
 
 

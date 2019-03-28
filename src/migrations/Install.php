@@ -119,8 +119,8 @@ class Install extends Migration
      */
     protected function addForeignKeys()
     {
-        $this->addForeignKey(null, '{{%printshop_files}}', ['assetId'], '{{%assets}}', ['id'], 'SET NULL');
-        $this->addForeignKey(null, '{{%printshop_files}}', ['lineItemId'], '{{%commerce_lineitems}}', ['id'], 'SET NULL');
+        $this->addForeignKey(null, '{{%printshop_files}}', ['assetId'], '{{%assets}}', ['id'], 'CASCADE');
+        $this->addForeignKey(null, '{{%printshop_files}}', ['lineItemId'], '{{%commerce_lineitems}}', ['id'], 'CASCADE');
     }
 
     /**
