@@ -14,6 +14,8 @@ use angellco\printshop\models\Settings;
 use angellco\printshop\PrintShop;
 
 use Craft;
+use craft\errors\UploadFailedException;
+use craft\helpers\Assets;
 use craft\helpers\Db;
 use craft\models\VolumeFolder;
 use craft\web\Controller;
@@ -55,25 +57,23 @@ class FilesController extends Controller
         $filesVolumeId = Db::idByUid('{{%volumes}}', $settings->filesVolumeUid);
 
 
+        $assets = Craft::$app->getAssets();
+
         /**
          * Make a folder for the order using the order hash
          */
         $cart = PrintShop::$commerce->getCarts()->getCart();
-        $rootFolder = Craft::$app->getAssets()->getRootFolderByVolumeId($filesVolumeId);
+        $rootFolder = $assets->getRootFolderByVolumeId($filesVolumeId);
 
         // Try for a folder with that name first - in case it already exists
-        $folder = Craft::$app->getAssets()->findFolder([
+        $folder = $assets->findFolder([
             'parentId' => $rootFolder->id,
             'name' => $cart->number,
             'path' => $settings->filesVolumeSubpath.'/'.$cart->number
         ]);
 
         // Check if we got one
-        if ($folder)
-        {
-            $folderId = $folder->id;
-        }
-        else
+        if (!$folder)
         {
             // We didn’t, so create it
             try {
@@ -83,16 +83,16 @@ class FilesController extends Controller
                 $folderModel->volumeId = $rootFolder->volumeId;
                 $folderModel->path = $settings->filesVolumeSubpath.'/'.$cart->number;
 
-                Craft::$app->getAssets()->createFolder($folderModel);
+                $assets->createFolder($folderModel);
 
-                $folderId = $folderModel->id;
+                $folder = $folderModel;
             } catch (AssetException $exception) {
                 return $this->asErrorJson($exception->getMessage());
             }
         }
 
         // Final folderId check
-        if (!$folderId)
+        if (!$folder)
         {
             return $this->asErrorJson(Craft::t('print-shop', 'Unable to upload files at this time.'));
         }
@@ -109,8 +109,18 @@ class FilesController extends Controller
             $fileName = $uploadedFile->getBaseName().'.tiff';
         }
 
+
         // XXX
         Craft::dd($fileName);
+        $tempPath = $this->_getUploadedFileTempPath($uploadedFile);
+        $fileName = Assets::prepareAssetName($fileName);
+
+        $asset = new Asset();
+        // ...
+
+//        $folder
+
+
         $fileLocation = AssetsHelper::getTempFilePath(pathinfo($fileName, PATHINFO_EXTENSION));
         move_uploaded_file($_FILES['file_'.$lineItemId]['tmp_name'], $fileLocation);
 
@@ -243,6 +253,37 @@ class FilesController extends Controller
             craft()->request->sendFile($asset->filename, IOHelper::getFileContents($localCopy), array('forceDownload' => true));
             craft()->end();
         }
+    }
+
+    // Private Methods
+    // =========================================================================
+
+    /**
+     * Borrowed from AssetsController.php
+     *
+     * @param UploadedFile $uploadedFile
+     *
+     * @return string
+     * @throws UploadFailedException
+     */
+    private function _getUploadedFileTempPath(UploadedFile $uploadedFile)
+    {
+        if ($uploadedFile->getHasError()) {
+            throw new UploadFailedException($uploadedFile->error);
+        }
+
+        // Move the uploaded file to the temp folder
+        try {
+            $tempPath = $uploadedFile->saveAsTempFile();
+        } catch (ErrorException $e) {
+            throw new UploadFailedException(0, null, $e);
+        }
+
+        if ($tempPath === false) {
+            throw new UploadFailedException(UPLOAD_ERR_CANT_WRITE);
+        }
+
+        return $tempPath;
     }
 
 }
