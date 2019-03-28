@@ -14,6 +14,7 @@ use angellco\printshop\models\Settings;
 use angellco\printshop\PrintShop;
 
 use Craft;
+use craft\elements\Asset;
 use craft\errors\UploadFailedException;
 use craft\helpers\Assets;
 use craft\helpers\Db;
@@ -69,7 +70,7 @@ class FilesController extends Controller
         $folder = $assets->findFolder([
             'parentId' => $rootFolder->id,
             'name' => $cart->number,
-            'path' => $settings->filesVolumeSubpath.'/'.$cart->number
+            'path' => $settings->filesVolumeSubpath.'/'.$cart->number.'/'
         ]);
 
         // Check if we got one
@@ -81,7 +82,7 @@ class FilesController extends Controller
                 $folderModel->name = $cart->number;
                 $folderModel->parentId = $rootFolder->id;
                 $folderModel->volumeId = $rootFolder->volumeId;
-                $folderModel->path = $settings->filesVolumeSubpath.'/'.$cart->number;
+                $folderModel->path = $settings->filesVolumeSubpath.'/'.$cart->number.'/';
 
                 $assets->createFolder($folderModel);
 
@@ -109,46 +110,48 @@ class FilesController extends Controller
             $fileName = $uploadedFile->getBaseName().'.tiff';
         }
 
+        try {
+            $tempPath = $this->_getUploadedFileTempPath($uploadedFile);
 
-        // XXX
-        Craft::dd($fileName);
-        $tempPath = $this->_getUploadedFileTempPath($uploadedFile);
-        $fileName = Assets::prepareAssetName($fileName);
+            $fileName = Assets::prepareAssetName($fileName);
 
-        $asset = new Asset();
-        // ...
+            $asset = new Asset();
+            $asset->tempFilePath = $tempPath;
+            $asset->filename = $fileName;
+            $asset->newFolderId = $folder->id;
+            $asset->volumeId = $folder->volumeId;
+            $asset->avoidFilenameConflicts = true;
+            $asset->setScenario(Asset::SCENARIO_CREATE);
 
-//        $folder
+            $result = Craft::$app->getElements()->saveElement($asset);
 
-
-        $fileLocation = AssetsHelper::getTempFilePath(pathinfo($fileName, PATHINFO_EXTENSION));
-        move_uploaded_file($_FILES['file_'.$lineItemId]['tmp_name'], $fileLocation);
-
-        $response = craft()->assets->insertFileByLocalPath($fileLocation, $fileName, $folderId, AssetConflictResolution::KeepBoth);
-
-        IOHelper::deleteFile($fileLocation, true);
-
-        if ($response->isError())
-        {
-            if (craft()->request->isAjaxRequest)
-            {
-                $this->returnJson(array(
-                    'success' => false,
-                    'message' => $response->getAttribute('errorMessage'),
-                ));
+            // In case of error, let user know about it.
+            if (!$result) {
+                $errors = $asset->getFirstErrors();
+                return $this->asErrorJson(Craft::t('print-shop', 'Failed to save the file:') . implode(";\n", $errors));
             }
-            craft()->userSession->setError($response->getAttribute('errorMessage'));
+
+            if ($asset->conflictingFilename !== null) {
+                $conflictingAsset = Asset::findOne(['folderId' => $folder->id, 'filename' => $asset->conflictingFilename]);
+                $assets->replaceAssetFile($conflictingAsset, $tempPath, $fileName);
+
+                $asset = $conflictingAsset;
+            }
+
+        } catch (\Throwable $e) {
+            Craft::error('An error occurred when saving an asset: ' . $e->getMessage(), __METHOD__);
+            Craft::$app->getErrorHandler()->logException($e);
+            return $this->asErrorJson($e->getMessage());
         }
 
-        // Keep hold of the Asset ID
-        $fileId = $response->getDataItem('fileId');
 
+        Craft::dd([$asset->id, $asset->filename, $asset->getPath()]);
 
         /**
          * Insert an OrderAssets_File record
          */
         $model = new OrderAssets_FileModel();
-        $model->assetId = $fileId;
+        $model->assetId = $asset->id;
         $model->lineItemId = $lineItemId;
 
         $success = craft()->orderAssets_files->saveOrderAssetFile($model);
