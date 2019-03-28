@@ -18,6 +18,7 @@ use angellco\printshop\PrintShop;
 use angellco\printshop\records\File as FileRecord;
 use Craft;
 use craft\base\Component;
+use craft\elements\Asset;
 use Craft\OrderAssets_FileModel;
 
 /**
@@ -180,7 +181,11 @@ class Files extends Component
 
             // Remove the asset element - this will cascade down to our record
             $file = $this->getFileById($fileId);
-            $result = Craft::$app->getElements()->deleteElementById($file->assetId);
+            $result = Craft::$app->getElements()->deleteElementById($file->assetId, Asset::class);
+
+            // XXX Why is this not deleting?
+
+            Craft::dd($result);
 
             $transaction->commit();
 
