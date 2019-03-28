@@ -10,6 +10,7 @@
 
 namespace angellco\printshop\controllers;
 
+use angellco\printshop\models\File;
 use angellco\printshop\models\Settings;
 use angellco\printshop\PrintShop;
 
@@ -131,13 +132,6 @@ class FilesController extends Controller
                 return $this->asErrorJson(Craft::t('print-shop', 'Failed to save the file:') . implode(";\n", $errors));
             }
 
-            if ($asset->conflictingFilename !== null) {
-                $conflictingAsset = Asset::findOne(['folderId' => $folder->id, 'filename' => $asset->conflictingFilename]);
-                $assets->replaceAssetFile($conflictingAsset, $tempPath, $fileName);
-
-                $asset = $conflictingAsset;
-            }
-
         } catch (\Throwable $e) {
             Craft::error('An error occurred when saving an asset: ' . $e->getMessage(), __METHOD__);
             Craft::$app->getErrorHandler()->logException($e);
@@ -145,41 +139,43 @@ class FilesController extends Controller
         }
 
 
-        Craft::dd([$asset->id, $asset->filename, $asset->getPath()]);
-
         /**
-         * Insert an OrderAssets_File record
+         * Insert a new File record
          */
-        $model = new OrderAssets_FileModel();
-        $model->assetId = $asset->id;
-        $model->lineItemId = $lineItemId;
+        $file = new File();
+        $file->assetId = $asset->id;
+        $file->lineItemId = $lineItemId;
 
-        $success = craft()->orderAssets_files->saveOrderAssetFile($model);
-        if ($success)
-        {
-            if (craft()->request->isAjaxRequest)
-            {
-                $this->returnJson(array(
-                    'success' => true,
-                    'message' => Craft::t('File uploaded.'),
-                    'file'    => $model
-                ));
-            }
+        // TODO make the file service
 
-            craft()->userSession->setNotice(Craft::t('File uploaded.'));
-            $this->redirectToPostedUrl();
-        }
-        else
-        {
-            if (craft()->request->isAjaxRequest)
-            {
-                $this->returnJson(array(
-                    'success' => false,
-                    'message' => Craft::t('Sorry there was a problem, please try again.'),
-                ));
-            }
-            craft()->userSession->setError(Craft::t('Sorry there was a problem, please try again.'));
-        }
+        Craft::dd($file);
+
+//        $success = craft()->orderAssets_files->saveOrderAssetFile($model);
+//        if ($success)
+//        {
+//            if (craft()->request->isAjaxRequest)
+//            {
+//                $this->returnJson(array(
+//                    'success' => true,
+//                    'message' => Craft::t('File uploaded.'),
+//                    'file'    => $model
+//                ));
+//            }
+//
+//            craft()->userSession->setNotice(Craft::t('File uploaded.'));
+//            $this->redirectToPostedUrl();
+//        }
+//        else
+//        {
+//            if (craft()->request->isAjaxRequest)
+//            {
+//                $this->returnJson(array(
+//                    'success' => false,
+//                    'message' => Craft::t('Sorry there was a problem, please try again.'),
+//                ));
+//            }
+//            craft()->userSession->setError(Craft::t('Sorry there was a problem, please try again.'));
+//        }
 
     }
 
