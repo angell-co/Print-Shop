@@ -15,4 +15,5 @@
  */
 return [
     'Print Shop plugin loaded' => 'Print Shop plugin loaded',
+    'Unable to upload files at this time.' => 'Unable to upload files at this time.'
 ];

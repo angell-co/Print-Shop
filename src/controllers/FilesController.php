@@ -14,7 +14,10 @@ use angellco\printshop\models\Settings;
 use angellco\printshop\PrintShop;
 
 use Craft;
+use craft\helpers\Db;
+use craft\models\VolumeFolder;
 use craft\web\Controller;
+use craft\web\UploadedFile;
 
 /**
  * @author    Angell & Co
@@ -43,6 +46,7 @@ class FilesController extends Controller
     public function actionUpload()
     {
         $this->requirePostRequest();
+        $this->requireAcceptsJson();
         $lineItemId = Craft::$app->getRequest()->getRequiredParam('lineItemId');
 
         // Get the plugin settings so we have access to the volume info
@@ -57,13 +61,12 @@ class FilesController extends Controller
         $cart = PrintShop::$commerce->getCarts()->getCart();
         $rootFolder = Craft::$app->getAssets()->getRootFolderByVolumeId($filesVolumeId);
 
-        // XXX here
-
         // Try for a folder with that name first - in case it already exists
-        $folder = craft()->assets->findFolder(array(
-            'parent' => $rootFolder->id,
-            'name' => $cart->number
-        ));
+        $folder = Craft::$app->getAssets()->findFolder([
+            'parentId' => $rootFolder->id,
+            'name' => $cart->number,
+            'path' => $settings->filesVolumeSubpath.'/'.$cart->number
+        ]);
 
         // Check if we got one
         if ($folder)
@@ -73,36 +76,25 @@ class FilesController extends Controller
         else
         {
             // We didn’t, so create it
-            $folderResponse = craft()->assets->createFolder($rootFolder->id, $cart->number);
+            try {
+                $folderModel = new VolumeFolder();
+                $folderModel->name = $cart->number;
+                $folderModel->parentId = $rootFolder->id;
+                $folderModel->volumeId = $rootFolder->volumeId;
+                $folderModel->path = $settings->filesVolumeSubpath.'/'.$cart->number;
 
-            if ($folderResponse->isError())
-            {
-                if (craft()->request->isAjaxRequest)
-                {
-                    $this->returnJson(array(
-                        'success' => false,
-                        'message' => $folderResponse->getAttribute('errorMessage'),
-                    ));
-                }
-                craft()->userSession->setError($folderResponse->getAttribute('errorMessage'));
-            }
-            else
-            {
-                $folderId = $folderResponse->getDataItem('folderId');
+                Craft::$app->getAssets()->createFolder($folderModel);
+
+                $folderId = $folderModel->id;
+            } catch (AssetException $exception) {
+                return $this->asErrorJson($exception->getMessage());
             }
         }
 
         // Final folderId check
         if (!$folderId)
         {
-            if (craft()->request->isAjaxRequest)
-            {
-                $this->returnJson(array(
-                    'success' => false,
-                    'message' => Craft::t('Unable to upload files at this time.'),
-                ));
-            }
-            craft()->userSession->setError(Craft::t('Unable to upload files at this time.'));
+            return $this->asErrorJson(Craft::t('print-shop', 'Unable to upload files at this time.'));
         }
 
 
@@ -110,13 +102,15 @@ class FilesController extends Controller
          * Upload the file to Assets and store it in the folder we got from above.
          * Straight from `AssetsController::actionExpressUpload()`
          */
-        $fileName = $_FILES['file_'.$lineItemId]['name'];
+        $uploadedFile = UploadedFile::getInstanceByName('file_'.$lineItemId);
+        $fileName = $uploadedFile->name;
 
-        $fileInfo = pathinfo($fileName);
-        if ($fileInfo['extension'] === 'tif') {
-            $fileName = $fileInfo['filename'].'.tiff';
+        if ($uploadedFile->getExtension() === 'tif') {
+            $fileName = $uploadedFile->getBaseName().'.tiff';
         }
 
+        // XXX
+        Craft::dd($fileName);
         $fileLocation = AssetsHelper::getTempFilePath(pathinfo($fileName, PATHINFO_EXTENSION));
         move_uploaded_file($_FILES['file_'.$lineItemId]['tmp_name'], $fileLocation);
 
