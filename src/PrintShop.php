@@ -76,14 +76,6 @@ class PrintShop extends Plugin
         self::$plugin = $this;
         self::$commerce = Commerce::getInstance();
 
-//        Event::on(
-//            Fields::class,
-//            Fields::EVENT_REGISTER_FIELD_TYPES,
-//            function (RegisterComponentTypesEvent $event) {
-//                $event->types[] = PrintShopFieldField::class;
-//            }
-//        );
-
         // Hook in to the order edit page
         Craft::$app->view->hook('cp.commerce.order.edit', function(array &$context) {
             $context['tabs'][] = [
@@ -93,6 +85,7 @@ class PrintShop extends Plugin
             ];
         });
         Craft::$app->view->hook('cp.commerce.order.edit.main-pane', function(array &$context) {
+            Craft::$app->view->registerAssetBundle("angellco\\printshop\\assetbundles\\printshop\\PrintShopAsset");
             return Craft::$app->view->renderTemplate('print-shop/orders/_edit-pane', $context);
         });
 

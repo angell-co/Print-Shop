@@ -19,5 +19,6 @@ return [
     'Unable to upload files at this time.' => 'Unable to upload files at this time.',
     'Failed to save the file:' => 'Failed to save the file:',
     'No Files exist with the ID “{id}”' => 'No Files exist with the ID “{id}”',
-    'Sorry there was a problem, please try again.' => 'Sorry there was a problem, please try again.'
+    'Sorry there was a problem, please try again.' => 'Sorry there was a problem, please try again.',
+    'The File you’re trying to access does not exist.' => 'The File you’re trying to access does not exist.'
 ];

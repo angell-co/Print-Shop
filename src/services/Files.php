@@ -210,6 +210,7 @@ class Files extends Component
             'id',
             'assetId',
             'lineItemId',
+            'uid'
         ]));
 
         return $file;

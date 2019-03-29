@@ -14,6 +14,7 @@ use angellco\printshop\PrintShop;
 
 use Craft;
 use craft\base\Model;
+use craft\helpers\UrlHelper;
 
 /**
  * @property int $id ID
@@ -44,6 +45,11 @@ class File extends Model
      */
     public $lineItemId;
 
+    /**
+     * @var string UID
+     */
+    public $uid;
+
     // Public Methods
     // =========================================================================
 
@@ -65,6 +71,16 @@ class File extends Model
     public function getLineItem()
     {
         return PrintShop::$commerce->getLineItems()->getLineItemById($this->lineItemId);
+    }
+
+    /**
+     * Returns an action URL that allows the Asset to be downloaded
+     *
+     * @return string
+     */
+    public function getDownloadUrl()
+    {
+        return UrlHelper::actionUrl('print-shop/files/download', ['uid' => $this->uid]);
     }
 
     /**

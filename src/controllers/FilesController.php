@@ -17,11 +17,15 @@ use angellco\printshop\PrintShop;
 use Craft;
 use craft\elements\Asset;
 use craft\errors\UploadFailedException;
+use craft\helpers\App;
 use craft\helpers\Assets;
 use craft\helpers\Db;
+use craft\helpers\FileHelper;
 use craft\models\VolumeFolder;
 use craft\web\Controller;
 use craft\web\UploadedFile;
+use yii\web\BadRequestHttpException;
+use yii\web\Response;
 
 /**
  * @author    Angell & Co
@@ -30,7 +34,6 @@ use craft\web\UploadedFile;
  */
 class FilesController extends Controller
 {
-
     // Protected Properties
     // =========================================================================
 
@@ -45,9 +48,17 @@ class FilesController extends Controller
     // =========================================================================
 
     /**
-     * Handle a request going to our plugin's index action URL, e.g.: actions/orderAssets
+     * Upload a file against a line item.
+     *
+     * @return Response
+     * @throws BadRequestHttpException
+     * @throws \Throwable
+     * @throws \craft\errors\AssetConflictException
+     * @throws \craft\errors\ElementNotFoundException
+     * @throws \craft\errors\VolumeObjectExistsException
+     * @throws \yii\base\Exception
      */
-    public function actionUpload()
+    public function actionUpload(): Response
     {
         $this->requirePostRequest();
         $this->requireAcceptsJson();
@@ -152,79 +163,73 @@ class FilesController extends Controller
         return $this->asJson(['success' => true, 'file' => $file]);
     }
 
+    /**
+     * Deletes a File
+     */
+//    public function actionDelete()
+//    {
+//
+//        $this->requirePostRequest();
+//        $id = craft()->request->getRequiredPost('id');
+//
+//        $success = craft()->orderAssets_files->deleteOrderAssetFileById($id);
+//
+//        if ($success)
+//        {
+//            if (craft()->request->isAjaxRequest)
+//            {
+//                $this->returnJson(array(
+//                    'success' => true,
+//                    'message' => Craft::t('File deleted.'),
+//                ));
+//            }
+//
+//            craft()->userSession->setNotice(Craft::t('File deleted.'));
+//            $this->redirectToPostedUrl();
+//        }
+//        else
+//        {
+//            if (craft()->request->isAjaxRequest)
+//            {
+//                $this->returnJson(array(
+//                    'success' => false,
+//                    'message' => Craft::t('Sorry there was a problem, please try again.'),
+//                ));
+//            }
+//            craft()->userSession->setError(Craft::t('Sorry there was a problem, please try again.'));
+//        }
+//
+//    }
 
     /**
-     * Deletes an OrderAsset_File
+     * Downloads a file, modified from AssetsController.php
      *
-     * @return json
+     * @return Response
+     * @throws BadRequestHttpException
      */
-    public function actionDelete()
+    public function actionDownload(): Response
     {
+        $fileUid = Craft::$app->getRequest()->getRequiredParam('uid');
+        $fileId = Db::idByUid('{{%printshop_files}}', $fileUid);
 
-        $this->requirePostRequest();
-        $id = craft()->request->getRequiredPost('id');
-
-        $success = craft()->orderAssets_files->deleteOrderAssetFileById($id);
-
-        if ($success)
-        {
-            if (craft()->request->isAjaxRequest)
-            {
-                $this->returnJson(array(
-                    'success' => true,
-                    'message' => Craft::t('File deleted.'),
-                ));
-            }
-
-            craft()->userSession->setNotice(Craft::t('File deleted.'));
-            $this->redirectToPostedUrl();
+        $file = PrintShop::$plugin->files->getFileById($fileId);
+        if (!$file) {
+            throw new BadRequestHttpException(Craft::t('print-shop', 'The File you’re trying to access does not exist.'));
         }
-        else
-        {
-            if (craft()->request->isAjaxRequest)
-            {
-                $this->returnJson(array(
-                    'success' => false,
-                    'message' => Craft::t('Sorry there was a problem, please try again.'),
-                ));
-            }
-            craft()->userSession->setError(Craft::t('Sorry there was a problem, please try again.'));
+        
+        $asset = $file->getAsset();
+        if (!$asset) {
+            throw new BadRequestHttpException(Craft::t('app', 'The Asset you’re trying to download does not exist.'));
         }
 
-    }
+        // All systems go, engage hyperdrive! (so PHP doesn't interrupt our stream)
+        App::maxPowerCaptain();
+        $localPath = $asset->getCopyOfFile();
 
-    /**
-     * Downloads a file and cleans up old temporary assets
-     *
-     * @throws Exception
-     */
-    public function actionDownloadFile()
-    {
-        // Clean up temp assets files that are more than a day old
-        $files = IOHelper::getFiles(craft()->path->getTempPath(), true);
-        foreach ($files as $file)
-        {
-            $lastModifiedTime = IOHelper::getLastTimeModified($file, true);
-            if (substr(IOHelper::getFileName($file, false, true), 0, 6) === "assets" && DateTimeHelper::currentTimeStamp() - $lastModifiedTime->getTimestamp() >= 86400)
-            {
-                IOHelper::deleteFile($file);
-            }
-        }
-        // Sort out the file we want to download
-        $id = craft()->request->getParam('id');
-        $criteria = craft()->elements->getCriteria(ElementType::Asset);
-        $criteria->id = $id;
-        /** @var AssetFileModel $asset */
-        $asset = $criteria->first();
-        if ($asset)
-        {
-            // Get a local copy of the file
-            $sourceType = craft()->assetSources->getSourceTypeById($asset->sourceId);
-            $localCopy = $sourceType->getLocalCopy($asset);
-            // Send it to the browser
-            craft()->request->sendFile($asset->filename, IOHelper::getFileContents($localCopy), array('forceDownload' => true));
-            craft()->end();
-        }
+        $response = Craft::$app->getResponse()->sendFile($localPath, $asset->filename);
+        FileHelper::unlink($localPath);
+
+        return $response;
     }
 
     // Private Methods

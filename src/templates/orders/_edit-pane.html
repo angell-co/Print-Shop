@@ -52,7 +52,15 @@
                         {% endif %}
                     </td>
                     <td data-title="{{ 'File'|t('print-shop') }}">
-                        TODO
+                        {% set file = craft.printShop.getFile(lineItem.id) %}
+                        {% if file %}
+                            <a href="{{ file.getDownloadUrl() }}" class="printshop__element-link">
+                                {% include '_elements/element' with {
+                                    'element' : file.getAsset(),
+                                    'size' : 'large'
+                                } %}
+                            </a>
+                        {% endif %}
                     </td>
                     <td data-title="{{ 'Note'|t('commerce') }}">
                         {% if lineItem.note %}

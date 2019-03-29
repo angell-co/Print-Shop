@@ -9,3 +9,9 @@
  * @package   PrintShop
  * @since     2.0.0
  */
+.printshop__element-link .element {
+    cursor: pointer;
+}
+.printshop__element-link:hover .title {
+    text-decoration: underline;
+}

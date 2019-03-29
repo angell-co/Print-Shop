@@ -25,15 +25,27 @@ class PrintShopVariable
     // =========================================================================
 
     /**
-     * @param null $optional
-     * @return string
+     * Returns a File model for a given LineItem ID
+     *
+     * @param int $lineItemId
+     *
+     * @return \angellco\printshop\models\File|bool
      */
-    public function exampleVariable($optional = null)
+    public function getFile($lineItemId)
     {
-        $result = "And away we go to the Twig template...";
-        if ($optional) {
-            $result = "I'm feeling optional today...";
-        }
-        return $result;
+        return PrintShop::$plugin->files->getFileByLineItemId($lineItemId);
     }
+
+    /**
+     * Returns a Proof model by its uid
+     *
+     * @param string $number
+     *
+     * @return mixed
+     */
+    public function getProof($number)
+    {
+        //
+    }
+
 }
