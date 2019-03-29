@@ -143,32 +143,34 @@ class Files extends Component
                 $file->id = $fileRecord->id;
             }
 
-            // Delete any other records that exist for this line item
-            $records = FileRecord::find()
-                ->where(['lineItemId' => $file->lineItemId])
-                ->all();
-
-            foreach ($records as $record) {
-                if ($record->id !== $file->id) {
-                    $this->deleteFileById($record->id);
-                }
-            }
-
             $transaction->commit();
         } catch (\Throwable $e) {
             $transaction->rollBack();
             throw $e;
         }
 
+        // Delete any other records that exist for this line item
+        $records = FileRecord::find()
+            ->where(['lineItemId' => $file->lineItemId])
+            ->all();
+
+        foreach ($records as $record) {
+            if ($record->id !== $file->id) {
+                $this->deleteFileById($record->id);
+            }
+        }
+
         return true;
     }
 
     /**
-     * Deletes a File by its id
+     * Deletes a File by its id, including the Asset element but not the
+     * LineItem of course.
      *
-     * @param int $fileId
-     * @throws \Exception
+     * @param $fileId
+     *
      * @return bool
+     * @throws \Throwable
      */
     public function deleteFileById($fileId)
     {
@@ -176,24 +178,14 @@ class Files extends Component
             return false;
         }
 
-        $transaction = Craft::$app->getDb()->beginTransaction();
-        try {
+        // Remove the asset element - this will cascade down to our record
+        $file = $this->getFileById($fileId);
 
-            // Remove the asset element - this will cascade down to our record
-            $file = $this->getFileById($fileId);
-            $result = Craft::$app->getElements()->deleteElementById($file->assetId, Asset::class);
-
-            // XXX Why is this not deleting?
-
-            Craft::dd($result);
-
-            $transaction->commit();
-
-            return (bool) $result;
-        } catch (\Throwable $e) {
-            $transaction->rollBack();
-            throw $e;
+        if (!$file) {
+            return false;
         }
+
+        return Craft::$app->getElements()->deleteElementById($file->assetId, Asset::class);
     }
 
     // Private Methods
