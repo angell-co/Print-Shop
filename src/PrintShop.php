@@ -84,6 +84,19 @@ class PrintShop extends Plugin
 //            }
 //        );
 
+        // Hook in to the order edit page
+        Craft::$app->view->hook('cp.commerce.order.edit', function(array &$context) {
+            $context['tabs'][] = [
+                'label' => Craft::t('print-shop', 'Print Shop'),
+                'url' => '#printShop',
+                'class' => null
+            ];
+        });
+        Craft::$app->view->hook('cp.commerce.order.edit.main-pane', function(array &$context) {
+            return Craft::$app->view->renderTemplate('print-shop/orders/_edit-pane', $context);
+        });
+
+        // Load up the Variable
         Event::on(
             CraftVariable::class,
             CraftVariable::EVENT_INIT,
@@ -94,6 +107,7 @@ class PrintShop extends Plugin
             }
         );
 
+        // After install event
         Event::on(
             Plugins::class,
             Plugins::EVENT_AFTER_INSTALL_PLUGIN,
@@ -108,6 +122,7 @@ class PrintShop extends Plugin
             }
         );
 
+        // Log when the plugin init has run
         Craft::info(
             Craft::t(
                 'print-shop',
@@ -116,6 +131,7 @@ class PrintShop extends Plugin
             ),
             __METHOD__
         );
+
     }
 
     // Protected Methods

@@ -1,0 +1,73 @@
+</div>
+<div id="printShop" class="hidden">
+
+    {% if order.lineItems | length or order.totalPrice > 0 %}
+    <div class="order-details pane">
+        <table id="" class="data fullwidth collapsible">
+            <thead>
+                <tr>
+                    <th scope="col">{{ 'Item'|t('commerce') }}</th>
+                    <th scope="col">{{ 'File'|t('print-shop') }}</th>
+                    <th scope="col">{{ 'Note'|t('commerce') }}</th>
+                    <th scope="col">{{ 'Proofs'|t('print-shop') }}</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for lineItem in order.lineItems %}
+
+                {% set info = [
+                    { label: "Description", value: lineItem.description },
+                    { label: "Tax Category", value: lineItem.taxCategory.name },
+                    { label: "Shipping Category", value: lineItem.shippingCategory.name },
+                    { label: "Price", value: lineItem.price|currency(order.currency) },
+                    { label: "Sale Amount", value: lineItem.saleAmount|currency(order.currency) },
+                    { label: "Sale Price", value: lineItem.salePrice|currency(order.currency) },
+                    { label: "Quantity", value: lineItem.qty },
+                    { label: "Sub-total", value: lineItem.subtotal|currency(order.currency) },
+                    { label: "Total (with adjustments)", value: lineItem.total|currency(order.currency) },
+                ] %}
+
+                <tr class="infoRow" data-id="{{ lineItem.id }}" data-info="{{ info|json_encode }}">
+                    <td data-title="{{ 'Item'|t('commerce') }}">
+                        {% if lineItem.purchasable %}
+                            {% if lineItem.purchasable.cpEditUrl %}
+                                <a class="purchasable-link" href="{{ lineItem.purchasable.cpEditUrl }}">{{ lineItem.description }}</a>
+                            {% else %}
+                                <span class="description">{{ lineItem.description }}</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="description">{{ lineItem.description }}</span>
+                        {% endif %}
+                        <br><span class="code">{{ lineItem.sku }}</span>
+                        {% if lineItem.options|length %}
+                            <a class="fieldtoggle first last" data-target="info-{{ lineItem.id }}">{{ "Options"|t('commerce') }}</a>
+                            <span id="info-{{ lineItem.id }}" class="hidden">
+                            {% for key, option in lineItem.options %}
+                                {{ key|t('commerce') }}: {% if option is iterable %}
+                                <code>{{ option|json_encode|raw }}</code>{% else %}{{ option }}{% endif %}
+                                <br>
+                            {% endfor %}
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td data-title="{{ 'File'|t('print-shop') }}">
+                        TODO
+                    </td>
+                    <td data-title="{{ 'Note'|t('commerce') }}">
+                        {% if lineItem.note %}
+                            <span class="info">{{ lineItem.note|nl2br }}</span>
+                        {% endif %}
+                    </td>
+                    <td data-title="{{ 'Proofs'|t('print-shop') }}">
+                        TODO
+                    </td>
+                    <td>
+                        <span class="tableRowInfo" data-icon="info" href="#"></span>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
