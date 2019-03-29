@@ -10,16 +10,13 @@
 
 namespace angellco\printshop\services;
 
-use angellco\portal\models\Target;
-use angellco\portal\records\Target as TargetRecord;
 use angellco\printshop\models\File;
 use angellco\printshop\PrintShop;
-
 use angellco\printshop\records\File as FileRecord;
+
 use Craft;
 use craft\base\Component;
 use craft\elements\Asset;
-use Craft\OrderAssets_FileModel;
 
 /**
  * @author    Angell & Co
@@ -149,11 +146,12 @@ class Files extends Component
             throw $e;
         }
 
-        // Delete any other records that exist for this line item
+        // Get any other records that exist for this line item
         $records = FileRecord::find()
             ->where(['lineItemId' => $file->lineItemId])
             ->all();
 
+        // Soft delete the assets and hard delete the File Record
         foreach ($records as $record) {
             if ($record->id !== $file->id) {
                 $this->deleteFileById($record->id);
@@ -169,7 +167,7 @@ class Files extends Component
      *
      * @param $fileId
      *
-     * @return bool
+     * @return bool|int
      * @throws \Throwable
      */
     public function deleteFileById($fileId)
@@ -178,14 +176,18 @@ class Files extends Component
             return false;
         }
 
-        // Remove the asset element - this will cascade down to our record
+        /** @var File $file */
         $file = $this->getFileById($fileId);
 
         if (!$file) {
             return false;
         }
 
-        return Craft::$app->getElements()->deleteElementById($file->assetId, Asset::class);
+        // Remove the asset element
+        Craft::$app->getElements()->deleteElementById($file->assetId, Asset::class);
+
+        // Delete the File record
+        return FileRecord::deleteAll(['id' => $file->id]);
     }
 
     // Private Methods
