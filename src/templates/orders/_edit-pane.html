@@ -68,9 +68,23 @@
                         {% endif %}
                     </td>
                     <td data-title="{{ 'Proofs'|t('print-shop') }}">
-                        TODO - next up
+                        {% if file %}
 
+                            {% set isApproved = false %}
+                            {% for proof in file.getProofs() %}
+                                {% if proof.status == 'approved' %}{% set isApproved = true %}{% endif %}
 
+    {#                            {% include 'orderAssets/fieldtype/_row' with {#}
+    {#                                proof: proof#}
+    {#                            } only %}#}
+                            {% endfor %}
+
+                            {% if not isApproved %}
+
+                                not approved
+                            {% endif %}
+
+                        {% endif %}
 
                     </td>
                     <td>
