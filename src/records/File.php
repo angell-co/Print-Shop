@@ -54,5 +54,4 @@ class File extends ActiveRecord
     {
         return $this->hasOne(LineItem::class, ['id' => 'lineItemId']);
     }
-
 }
