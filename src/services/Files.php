@@ -44,7 +44,7 @@ class Files extends Component
         $models = [];
 
         foreach ($records as $record) {
-            $models[] = $this->_createFileFromRecord($record);
+            $models[] = new File($record);
         }
 
         return $models;
@@ -63,15 +63,15 @@ class Files extends Component
             return false;
         }
 
-        $record = FileRecord::find()
+        $result = FileRecord::find()
             ->where(['id' => $id])
             ->one();
 
-        if (!$record) {
+        if (!$result) {
             return false;
         }
 
-        return $this->_createFileFromRecord($record);
+        return $result ? new File($result) : null;
     }
 
     /**
@@ -87,15 +87,15 @@ class Files extends Component
             return false;
         }
 
-        $record = FileRecord::find()
+        $result = FileRecord::find()
             ->where(['lineItemId' => $lineItemId])
             ->one();
 
-        if (!$record) {
+        if (!$result) {
             return false;
         }
 
-        return $this->_createFileFromRecord($record);
+        return $result ? new File($result) : null;
     }
 
     /**
@@ -189,32 +189,5 @@ class Files extends Component
         // Delete the File record
         return FileRecord::deleteAll(['id' => $file->id]);
     }
-
-    // Private Methods
-    // =========================================================================
-
-    /**
-     * Creates a File with attributes from a FileRecord.
-     *
-     * @param FileRecord|null $fileRecord
-     *
-     * @return File|null
-     */
-    private function _createFileFromRecord(FileRecord $fileRecord = null)
-    {
-        if (!$fileRecord) {
-            return null;
-        }
-
-        $file = new File($fileRecord->toArray([
-            'id',
-            'assetId',
-            'lineItemId',
-            'uid'
-        ]));
-
-        return $file;
-    }
-    
 }
 

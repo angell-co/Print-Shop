@@ -63,7 +63,17 @@ class Proof extends Model
     public $customerNotes;
 
     /**
-     * @var string UID
+     * @var \DateTime|null Date created
+     */
+    public $dateCreated;
+
+    /**
+     * @var \DateTime|null Date updated
+     */
+    public $dateUpdated;
+
+    /**
+     * @var string|null Uid
      */
     public $uid;
 
