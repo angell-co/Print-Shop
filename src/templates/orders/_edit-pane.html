@@ -8,7 +8,7 @@
                 <tr>
                     <th scope="col">{{ 'Item'|t('commerce') }}</th>
                     <th scope="col">{{ 'File'|t('print-shop') }}</th>
-                    <th scope="col">{{ 'Note'|t('commerce') }}</th>
+                    <th scope="col">{{ 'Customer Note'|t('print-shop') }}</th>
                     <th scope="col">{{ 'Proofs'|t('print-shop') }}</th>
                     <th scope="col"></th>
                 </tr>
@@ -62,7 +62,7 @@
                             </a>
                         {% endif %}
                     </td>
-                    <td data-title="{{ 'Note'|t('commerce') }}">
+                    <td data-title="{{ 'Customer Note'|t('print-shop') }}">
                         {% if lineItem.note %}
                             <span class="info">{{ lineItem.note|nl2br }}</span>
                         {% endif %}
