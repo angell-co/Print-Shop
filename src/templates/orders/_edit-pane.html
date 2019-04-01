@@ -56,8 +56,8 @@
                         {% if file %}
                             <a href="{{ file.getDownloadUrl() }}" class="printshop__element-link">
                                 {% include '_elements/element' with {
-                                    'element' : file.getAsset(),
-                                    'size' : 'large'
+                                    element: file.getAsset(),
+                                    size: 'large'
                                 } %}
                             </a>
                         {% endif %}
@@ -79,3 +79,7 @@
         </table>
     </div>
     {% endif %}
+
+    {% js %}
+        (new Craft.ElementThumbLoader()).load($('#printShop'));
+    {% endjs %}
