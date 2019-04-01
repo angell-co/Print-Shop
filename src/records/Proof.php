@@ -35,16 +35,6 @@ class Proof extends ActiveRecord
     }
 
     /**
-     * Returns the associated asset with this Proof.
-     *
-     * @return ActiveQueryInterface The relational query object.
-     */
-    public function getAsset(): ActiveQueryInterface
-    {
-        return $this->hasOne(Asset::class, ['id' => 'assetId']);
-    }
-
-    /**
      * Returns the File that this Proof relates to.
      *
      * @return ActiveQueryInterface The relational query object.
@@ -52,5 +42,15 @@ class Proof extends ActiveRecord
     public function getFile(): ActiveQueryInterface
     {
         return $this->hasOne(File::class, ['id' => 'fileId']);
+    }
+
+    /**
+     * Returns the associated asset with this Proof.
+     *
+     * @return ActiveQueryInterface The relational query object.
+     */
+    public function getAsset(): ActiveQueryInterface
+    {
+        return $this->hasOne(Asset::class, ['id' => 'assetId']);
     }
 }

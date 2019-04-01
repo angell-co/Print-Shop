@@ -22,6 +22,13 @@ use craft\base\Model;
  */
 class Proof extends Model
 {
+    // Constants
+    // =========================================================================
+
+    const STATUS_NEW = 'new';
+    const STATUS_APPROVED = 'approved';
+    const STATUS_REJECTED = 'rejected';
+
     // Public Properties
     // =========================================================================
 

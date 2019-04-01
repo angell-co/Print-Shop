@@ -10,6 +10,7 @@
 
 namespace angellco\printshop\migrations;
 
+use angellco\printshop\models\Proof;
 use angellco\printshop\PrintShop;
 
 use Craft;
@@ -88,19 +89,24 @@ class Install extends Migration
             );
         }
 
-//        $tableSchema = Craft::$app->db->schema->getTableSchema('{{%printshop_proofs}}');
-//        if ($tableSchema === null) {
-//            $tablesCreated = true;
-//            $this->createTable(
-//                '{{%printshop_proofs}}',
-//                [
-//                    'id' => $this->primaryKey(),
-//                    'dateCreated' => $this->dateTime()->notNull(),
-//                    'dateUpdated' => $this->dateTime()->notNull(),
-//                    'uid' => $this->uid(),
-//                ]
-//            );
-//        }
+        $tableSchema = Craft::$app->db->schema->getTableSchema('{{%printshop_proofs}}');
+        if ($tableSchema === null) {
+            $tablesCreated = true;
+            $this->createTable(
+                '{{%printshop_proofs}}',
+                [
+                    'id' => $this->primaryKey(),
+                    'fileId' => $this->integer(),
+                    'assetId' => $this->integer(),
+                    'status' => $this->enum('status', [Proof::STATUS_NEW, Proof::STATUS_APPROVED, Proof::STATUS_REJECTED])->notNull()->defaultValue(Proof::STATUS_NEW),
+                    'staffNotes' => $this->string(),
+                    'customerNotes' => $this->string(),
+                    'dateCreated' => $this->dateTime()->notNull(),
+                    'dateUpdated' => $this->dateTime()->notNull(),
+                    'uid' => $this->uid(),
+                ]
+            );
+        }
 
         return $tablesCreated;
     }
@@ -112,6 +118,8 @@ class Install extends Migration
     {
         $this->createIndex(null, '{{%printshop_files}}', 'assetId', false);
         $this->createIndex(null, '{{%printshop_files}}', 'lineItemId', false);
+        $this->createIndex(null, '{{%printshop_proofs}}', 'fileId', false);
+        $this->createIndex(null, '{{%printshop_proofs}}', 'assetId', false);
     }
 
     /**
@@ -121,6 +129,8 @@ class Install extends Migration
     {
         $this->addForeignKey(null, '{{%printshop_files}}', ['assetId'], '{{%assets}}', ['id'], 'CASCADE');
         $this->addForeignKey(null, '{{%printshop_files}}', ['lineItemId'], '{{%commerce_lineitems}}', ['id'], 'CASCADE');
+        $this->addForeignKey(null, '{{%printshop_proofs}}', ['fileId'], '{{%printshop_files}}', ['id'], 'CASCADE');
+        $this->addForeignKey(null, '{{%printshop_proofs}}', ['assetId'], '{{%assets}}', ['id'], 'CASCADE');
     }
 
     /**
@@ -136,6 +146,6 @@ class Install extends Migration
     protected function removeTables()
     {
         $this->dropTableIfExists('{{%printshop_files}}');
-//        $this->dropTableIfExists('{{%printshop_proofs}}');
+        $this->dropTableIfExists('{{%printshop_proofs}}');
     }
 }
