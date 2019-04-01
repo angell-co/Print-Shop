@@ -83,6 +83,54 @@ class File extends Model
         return UrlHelper::actionUrl('print-shop/files/download', ['uid' => $this->uid]);
     }
 
+
+    /**
+     * Returns the latest proof for this File
+     *
+     * @return bool|BaseModel
+     */
+    public function getLatestProof()
+    {
+        // TODO - needs service
+//        return PrintShop::$plugin->proofs->getLatestProofForFile($this->id);
+
+//        $record = OrderAssets_ProofRecord::model()->ordered()->findByAttributes([
+//            'orderAssetFileId' => $this->id
+//        ]);
+//
+//        if (!$record) {
+//            return false;
+//        }
+//
+//        return OrderAssets_ProofModel::populateModel($record);
+    }
+
+    /**
+     * Returns all the proofs this File
+     *
+     * @return array|bool
+     */
+    public function getProofs()
+    {
+
+        // TODO - needs service
+//        return PrintShop::$plugin->proofs->getProofsForFile($this->id);
+
+//        $records = OrderAssets_ProofRecord::model()->findAllByAttributes([
+//            'orderAssetFileId' => $this->id
+//        ]);
+//
+//        if (!$records) {
+//            return false;
+//        }
+//
+//        return OrderAssets_ProofModel::populateModels($records);
+    }
+
+
+
+
+
     /**
      * @inheritdoc
      */
@@ -90,6 +138,7 @@ class File extends Model
     {
         $rules = parent::rules();
         $rules[] = [['id', 'assetId', 'lineItemId'], 'number', 'integerOnly' => true];
+        $rules[] = [['assetId', 'lineItemId'], 'required'];
         return $rules;
     }
 }
