@@ -12,7 +12,7 @@
           </td>
 
           <td>
-
+            <slot name="StaffNotesField"></slot>
           </td>
 
           <td>
@@ -29,21 +29,21 @@
 <script>
   export default {
     name: 'proofs',
-    props: ['proofs'],
+    props: ['proofs','lineItemId','source'],
     mounted() {
       this.$nextTick(function () {
         new Craft.AssetSelectInput({
-          criteria: {kind: ['image']},
+          criteria: { kind: ['image'] },
           elementType: "craft\\elements\\Asset",
           fieldId: null,
-          id: "newProof-2-asset",
+          id: "newProof-"+this.lineItemId+"-asset",
           limit: 1,
           modalStorageKey: null,
-          name: "newProof[2][asset]",
+          name: "newProof["+this.lineItemId+"][asset]",
           showSiteMenu: false,
           sortable: true,
           sourceElementId: null,
-          sources: ["volume:760c9b48-e1b8-4caa-bd14-1136c7b59160"],
+          sources: [this.source],
           viewMode: "list"
         });
       })

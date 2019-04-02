@@ -1,3 +1,4 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
 {% import "_includes/forms" as forms %}
 
 </div>
@@ -84,7 +85,16 @@
 
                                 {% endfor %}
 
-                                <proofs :proofs="'{{ file.getProofs()|e('js') }}'">
+                                {% set volume = craft.app.getVolumes().getVolumeByUid('760c9b48-e1b8-4caa-bd14-1136c7b59160') %}
+                                {% set folder = false %}
+
+                                {% if volume %}
+                                    {% set folder = craft.app.getAssets().getRootFolderByVolumeId(volume.id) %}
+                                {% endif %}
+
+                                <proofs :proofs="'{{ file.getProofs()|e('js') }}'"
+                                        :line-item-id="{{ lineItem.id }}"
+                                        :source="'folder:{{ folder.uid }}'">
 
                                     <div slot="AssetSelectInput">
                                         {{ forms.elementSelectField({
@@ -93,17 +103,26 @@
                                             name: 'newProof['~lineItem.id~'][asset]',
                                             elementType: 'craft\\elements\\Asset',
                                             selectionLabel: "Add a file"|t('app'),
-                                            sources: ['volume:760c9b48-e1b8-4caa-bd14-1136c7b59160'],
-                                            criteria: {
-                                                kind: ['image']
-                                            },
+                                            sources: ['folder:'~folder.uid],
+                                            criteria: { kind: ['image'] },
                                             limit: 1,
                                             elements: null,
                                             jsClass : 'Craft.AssetSelectInput'
                                         }) }}
                                     </div>
 
+                                    <div slot="StaffNotesField">
+                                        {{ forms.textareaField({
+                                            label: "Notes"|t,
+                                            id: 'newProof-'~lineItem.id~'-notes',
+                                            name: 'newProof['~lineItem.id~'][notes]',
+                                            rows: 4
+                                        }) }}
+                                    </div>
+
                                 </proofs>
+
+
 
                                 {# elementType: assetElementType,
                                    sources: proofAssetSources,
