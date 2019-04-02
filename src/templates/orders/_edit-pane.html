@@ -1,102 +1,128 @@
+{% import "_includes/forms" as forms %}
+
 </div>
-<div id="printShop" class="hidden">
 
-    {% if order.lineItems | length or order.totalPrice > 0 %}
-    <div class="order-details pane">
-        <table id="" class="data fullwidth collapsible">
-            <thead>
-                <tr>
-                    <th scope="col">{{ 'Item'|t('commerce') }}</th>
-                    <th scope="col">{{ 'File'|t('print-shop') }}</th>
-                    <th scope="col">{{ 'Customer Note'|t('print-shop') }}</th>
-                    <th scope="col">{{ 'Proofs'|t('print-shop') }}</th>
-                    <th scope="col"></th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for lineItem in order.lineItems %}
+<div id="printShopTab" class="hidden">
 
-                {% set info = [
-                    { label: "Description", value: lineItem.description },
-                    { label: "Tax Category", value: lineItem.taxCategory.name },
-                    { label: "Shipping Category", value: lineItem.shippingCategory.name },
-                    { label: "Price", value: lineItem.price|currency(order.currency) },
-                    { label: "Sale Amount", value: lineItem.saleAmount|currency(order.currency) },
-                    { label: "Sale Price", value: lineItem.salePrice|currency(order.currency) },
-                    { label: "Quantity", value: lineItem.qty },
-                    { label: "Sub-total", value: lineItem.subtotal|currency(order.currency) },
-                    { label: "Total (with adjustments)", value: lineItem.total|currency(order.currency) },
-                ] %}
+    <div id="printshop">
+        {% if order.lineItems | length or order.totalPrice > 0 %}
+        <div class="order-details pane">
+            <table id="" class="data fullwidth collapsible">
+                <thead>
+                    <tr>
+                        <th scope="col">{{ 'Item'|t('commerce') }}</th>
+                        <th scope="col">{{ 'File'|t('print-shop') }}</th>
+                        <th scope="col">{{ 'Customer Note'|t('print-shop') }}</th>
+                        <th scope="col">{{ 'Proofs'|t('print-shop') }}</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for lineItem in order.lineItems %}
 
-                <tr class="infoRow" data-id="{{ lineItem.id }}" data-info="{{ info|json_encode }}">
-                    <td data-title="{{ 'Item'|t('commerce') }}">
-                        {% if lineItem.purchasable %}
-                            {% if lineItem.purchasable.cpEditUrl %}
-                                <a class="purchasable-link" href="{{ lineItem.purchasable.cpEditUrl }}">{{ lineItem.description }}</a>
+                    {% set info = [
+                        { label: "Description", value: lineItem.description },
+                        { label: "Tax Category", value: lineItem.taxCategory.name },
+                        { label: "Shipping Category", value: lineItem.shippingCategory.name },
+                        { label: "Price", value: lineItem.price|currency(order.currency) },
+                        { label: "Sale Amount", value: lineItem.saleAmount|currency(order.currency) },
+                        { label: "Sale Price", value: lineItem.salePrice|currency(order.currency) },
+                        { label: "Quantity", value: lineItem.qty },
+                        { label: "Sub-total", value: lineItem.subtotal|currency(order.currency) },
+                        { label: "Total (with adjustments)", value: lineItem.total|currency(order.currency) },
+                    ] %}
+
+                    <tr class="infoRow" data-id="{{ lineItem.id }}" data-info="{{ info|json_encode }}">
+                        <td data-title="{{ 'Item'|t('commerce') }}">
+                            {% if lineItem.purchasable %}
+                                {% if lineItem.purchasable.cpEditUrl %}
+                                    <a class="purchasable-link" href="{{ lineItem.purchasable.cpEditUrl }}">{{ lineItem.description }}</a>
+                                {% else %}
+                                    <span class="description">{{ lineItem.description }}</span>
+                                {% endif %}
                             {% else %}
                                 <span class="description">{{ lineItem.description }}</span>
                             {% endif %}
-                        {% else %}
-                            <span class="description">{{ lineItem.description }}</span>
-                        {% endif %}
-                        <br><span class="code">{{ lineItem.sku }}</span>
-                        {% if lineItem.options|length %}
-                            <a class="fieldtoggle first last" data-target="info-{{ lineItem.id }}">{{ "Options"|t('commerce') }}</a>
-                            <span id="info-{{ lineItem.id }}" class="hidden">
-                            {% for key, option in lineItem.options %}
-                                {{ key|t('commerce') }}: {% if option is iterable %}
-                                <code>{{ option|json_encode|raw }}</code>{% else %}{{ option }}{% endif %}
-                                <br>
-                            {% endfor %}
-                            </span>
-                        {% endif %}
-                    </td>
-                    <td data-title="{{ 'File'|t('print-shop') }}">
-                        {% set file = craft.printShop.getFile(lineItem.id) %}
-                        {% if file %}
-                            <a href="{{ file.getDownloadUrl() }}" class="printshop__element-link">
-                                {% include '_elements/element' with {
-                                    element: file.getAsset(),
-                                    size: 'large'
-                                } %}
-                            </a>
-                        {% endif %}
-                    </td>
-                    <td data-title="{{ 'Customer Note'|t('print-shop') }}">
-                        {% if lineItem.note %}
-                            <span class="info">{{ lineItem.note|nl2br }}</span>
-                        {% endif %}
-                    </td>
-                    <td data-title="{{ 'Proofs'|t('print-shop') }}">
-                        {% if file %}
+                            <br><span class="code">{{ lineItem.sku }}</span>
+                            {% if lineItem.options|length %}
+                                <a class="fieldtoggle first last" data-target="info-{{ lineItem.id }}">{{ "Options"|t('commerce') }}</a>
+                                <span id="info-{{ lineItem.id }}" class="hidden">
+                                {% for key, option in lineItem.options %}
+                                    {{ key|t('commerce') }}: {% if option is iterable %}
+                                    <code>{{ option|json_encode|raw }}</code>{% else %}{{ option }}{% endif %}
+                                    <br>
+                                {% endfor %}
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td data-title="{{ 'File'|t('print-shop') }}">
+                            {% set file = craft.printShop.getFile(lineItem.id) %}
+                            {% if file %}
+                                <a href="{{ file.getDownloadUrl() }}" class="printshop__element-link">
+                                    {% include '_elements/element' with {
+                                        element: file.getAsset(),
+                                        size: 'large'
+                                    } %}
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td data-title="{{ 'Customer Note'|t('print-shop') }}">
+                            {% if lineItem.note %}
+                                <span class="info">{{ lineItem.note|nl2br }}</span>
+                            {% endif %}
+                        </td>
+                        <td data-title="{{ 'Proofs'|t('print-shop') }}">
+                            {% if file %}
 
-                            {% set isApproved = false %}
-                            {% for proof in file.getProofs() %}
-                                {% if proof.status == 'approved' %}{% set isApproved = true %}{% endif %}
+                                {% set isApproved = false %}
+                                {% for proof in file.getProofs() %}
+                                    {% if proof.status == 'approved' %}{% set isApproved = true %}{% endif %}
 
-    {#                            {% include 'orderAssets/fieldtype/_row' with {#}
-    {#                                proof: proof#}
-    {#                            } only %}#}
-                            {% endfor %}
+        {#                            {% include 'orderAssets/fieldtype/_row' with {#}
+        {#                                proof: proof#}
+        {#                            } only %}#}
 
-                            {% if not isApproved %}
+                                {% endfor %}
 
-                                not approved
+                                <proofs :proofs="'{{ file.getProofs()|e('js') }}'">
+
+                                    <div slot="AssetSelectInput">
+                                        {{ forms.elementSelectField({
+                                            label: "File"|t('app'),
+                                            id: 'newProof-'~lineItem.id~'-asset',
+                                            name: 'newProof['~lineItem.id~'][asset]',
+                                            elementType: 'craft\\elements\\Asset',
+                                            selectionLabel: "Add a file"|t('app'),
+                                            sources: ['volume:760c9b48-e1b8-4caa-bd14-1136c7b59160'],
+                                            criteria: {
+                                                kind: ['image']
+                                            },
+                                            limit: 1,
+                                            elements: null,
+                                            jsClass : 'Craft.AssetSelectInput'
+                                        }) }}
+                                    </div>
+
+                                </proofs>
+
+                                {# elementType: assetElementType,
+                                   sources: proofAssetSources,
+                                   criteria: proofAssetCriteria,#}
+
                             {% endif %}
 
-                        {% endif %}
-
-                    </td>
-                    <td>
-                        <span class="tableRowInfo" data-icon="info" href="#"></span>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                        </td>
+                        <td>
+                            <span class="tableRowInfo" data-icon="info" href="#"></span>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
 
     {% js %}
-        (new Craft.ElementThumbLoader()).load($('#printShop'));
+        (new Craft.ElementThumbLoader()).load($('#printShopTab'));
     {% endjs %}

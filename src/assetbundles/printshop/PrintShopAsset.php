@@ -13,6 +13,7 @@ namespace angellco\printshop\assetbundles\PrintShop;
 use Craft;
 use craft\web\AssetBundle;
 use craft\web\assets\cp\CpAsset;
+use craft\web\assets\vue\VueAsset;
 
 /**
  * @author    Angell & Co
@@ -33,14 +34,16 @@ class PrintShopAsset extends AssetBundle
 
         $this->depends = [
             CpAsset::class,
+            VueAsset::class,
         ];
 
         $this->js = [
-            'js/PrintShop.js',
+            'js/chunk-vendors.js',
+            'js/app.js',
         ];
 
         $this->css = [
-            'css/PrintShop.css',
+            'css/app.css',
         ];
 
         parent::init();

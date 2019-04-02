@@ -80,7 +80,7 @@ class PrintShop extends Plugin
         Craft::$app->view->hook('cp.commerce.order.edit', function(array &$context) {
             $context['tabs'][] = [
                 'label' => Craft::t('print-shop', 'Print Shop'),
-                'url' => '#printShop',
+                'url' => '#printShopTab',
                 'class' => null
             ];
         });
