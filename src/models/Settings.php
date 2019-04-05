@@ -33,22 +33,12 @@ class Settings extends Model
     /**
      * @var string
      */
-    public $filesVolumeUid;
+    public $volumeUid;
 
     /**
      * @var string
      */
-    public $filesVolumeSubpath;
-
-    /**
-     * @var string
-     */
-    public $proofsVolumeUid;
-
-    /**
-     * @var string
-     */
-    public $proofsVolumeSubpath;
+    public $volumeSubpath;
 
     // Public Methods
     // =========================================================================
@@ -61,17 +51,14 @@ class Settings extends Model
         return [
             [
                 [
-                    'filesVolumeUid',
-                    'filesVolumeSubpath',
-                    'proofsVolumeUid',
-                    'proofsVolumeSubpath'
+                    'volumeUid',
+                    'volumeSubpath',
                 ],
                 'string'
             ],
             [
                 [
-                    'filesVolumeUid',
-                    'proofsVolumeUid',
+                    'volumeUid',
                 ],
                 'required'
             ],

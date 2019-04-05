@@ -21,22 +21,22 @@
     {% set volumeList = volumeList|merge([{'value': volume.uid, 'label': volume.name}]) %}
 {% endfor %}
 
-{% macro assetLocationInput(prefix, volumeOptions, volumeUid, volumeSubpath) %}
+{% macro assetLocationInput(volumeOptions, volumeUid, volumeSubpath) %}
     {% from "_includes/forms" import select, text %}
     <div class="flex">
         <div>
             {{ select({
-                id: prefix~'VolumeUid',
-                name: prefix~'VolumeUid',
+                id: 'volumeUid',
+                name: 'volumeUid',
                 options: volumeOptions,
                 value: volumeUid,
             }) }}
         </div>
         <div class="flex-grow">
             {{ text({
-                id: prefix~'VolumeSubpath',
+                id: 'volumeSubpath',
                 class: 'ltr',
-                name: prefix~'VolumeSubpath',
+                name: 'volumeSubpath',
                 value: volumeSubpath,
                 placeholder: "path/to/subfolder"|t('app')
             }) }}
@@ -46,30 +46,15 @@
 
 {% from _self import assetLocationInput %}
 
-
 {% if volumeList %}
     {{ forms.field({
         first: true,
-        label: "Line Item Files Location"|t('print-shop'),
-        instructions: "Where do you want to store line item files?"|t('app')
-    }, assetLocationInput('files', volumeList, settings.filesVolumeUid ?? null, settings.filesVolumeSubpath ?? null)) }}
+        label: "Files and Proofs Location"|t('print-shop'),
+        instructions: "Where do you want to store line item files and proofs?"|t('print-shop')
+    }, assetLocationInput(volumeList, settings.volumeUid ?? null, settings.volumeSubpath ?? null)) }}
 {% else %}
     {{ forms.field({
         first: true,
-        label: "Line Item Files Location"|t('print-shop')
-    }, '<p class="error">' ~ "No volumes exist yet."|t('app') ~ '</p>') }}
-{% endif %}
-
-
-{% if volumeList %}
-    {{ forms.field({
-        first: true,
-        label: "Proofs Location"|t('print-shop'),
-        instructions: "Where do you want to store the proofs?"|t('app')
-    }, assetLocationInput('proofs', volumeList, settings.proofsVolumeUid ?? null, settings.proofsVolumeSubpath ?? null)) }}
-{% else %}
-    {{ forms.field({
-        first: true,
-        label: "Proofs Location"|t('print-shop')
+        label: "Files and Proofs Location"|t('print-shop')
     }, '<p class="error">' ~ "No volumes exist yet."|t('app') ~ '</p>') }}
 {% endif %}

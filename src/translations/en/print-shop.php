@@ -21,5 +21,8 @@ return [
     'No Files exist with the ID “{id}”' => 'No Files exist with the ID “{id}”',
     'Sorry there was a problem, please try again.' => 'Sorry there was a problem, please try again.',
     'The File you’re trying to access does not exist.' => 'The File you’re trying to access does not exist.',
-    'Customer Note' => 'Customer Note'
+    'Customer Note' => 'Customer Note',
+    'Files and Proofs Location' => 'Files and Proofs Location',
+    'Where do you want to store line item files and proofs' => 'Where do you want to store line item files and proofs',
+    'Customer-Files' => 'Customer-Files',
 ];
