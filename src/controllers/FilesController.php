@@ -81,7 +81,7 @@ class FilesController extends Controller
         $orderFolder = $assets->findFolder([
             'parentId' => $rootFolder->id,
             'name' => $cart->shortNumber,
-            'path' => $settings->volumeSubpath.'/'.$cart->shortNumber
+            'path' => $settings->volumeSubpath.'/'.$cart->shortNumber.'/'
         ]);
 
         // If we didn’t get one, create it
@@ -91,7 +91,7 @@ class FilesController extends Controller
                 $folderModel->name = $cart->shortNumber;
                 $folderModel->parentId = $rootFolder->id;
                 $folderModel->volumeId = $rootFolder->volumeId;
-                $folderModel->path = $settings->volumeSubpath.'/'.$cart->shortNumber;
+                $folderModel->path = $settings->volumeSubpath.'/'.$cart->shortNumber.'/';
 
                 $assets->createFolder($folderModel);
 
@@ -114,7 +114,7 @@ class FilesController extends Controller
         $customerFilesFolder = $assets->findFolder([
             'parentId' => $orderFolder->id,
             'name' => Craft::t('print-shop','Customer Files'),
-            'path' => $orderFolder->path.'/'.Craft::t('print-shop','Customer-Files'),
+            'path' => $orderFolder->path.Craft::t('print-shop','Customer-Files').'/',
         ]);
 
         // Check if we got one
@@ -125,7 +125,7 @@ class FilesController extends Controller
                 $folderModel->name = Craft::t('print-shop','Customer Files');
                 $folderModel->parentId = $orderFolder->id;
                 $folderModel->volumeId = $orderFolder->volumeId;
-                $folderModel->path = $orderFolder->path.'/'.Craft::t('print-shop','Customer-Files');
+                $folderModel->path = $orderFolder->path.Craft::t('print-shop','Customer-Files').'/';
 
                 $assets->createFolder($folderModel);
 
@@ -148,7 +148,7 @@ class FilesController extends Controller
         $proofsFolder = $assets->findFolder([
             'parentId' => $orderFolder->id,
             'name' => Craft::t('print-shop','Proofs'),
-            'path' => $orderFolder->path.'/'.Craft::t('print-shop','Proofs'),
+            'path' => $orderFolder->path.Craft::t('print-shop','Proofs').'/',
         ]);
 
         // Check if we got one
@@ -159,7 +159,7 @@ class FilesController extends Controller
                 $folderModel->name = Craft::t('print-shop','Proofs');
                 $folderModel->parentId = $orderFolder->id;
                 $folderModel->volumeId = $orderFolder->volumeId;
-                $folderModel->path = $orderFolder->path.'/'.Craft::t('print-shop','Proofs');
+                $folderModel->path = $orderFolder->path.Craft::t('print-shop','Proofs').'/';
 
                 $assets->createFolder($folderModel);
 

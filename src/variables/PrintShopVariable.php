@@ -67,7 +67,7 @@ class PrintShopVariable
 
         $folder = Craft::$app->getAssets()->findFolder([
             'volumeId' => $volumeId,
-            'path' => $settings->volumeSubpath.'/'.$shortNumber.'/'.Craft::t('print-shop','Proofs')
+            'path' => $settings->volumeSubpath.'/'.$shortNumber.'/'.Craft::t('print-shop','Proofs').'/'
         ]);
 
         if (!$folder) {
