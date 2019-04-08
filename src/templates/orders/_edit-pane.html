@@ -75,27 +75,21 @@
                         <td data-title="{{ 'Proofs'|t('print-shop') }}">
                             {% if file %}
 
-                                {% set isApproved = false %}
-                                {% for proof in file.getProofs() %}
-                                    {% if proof.status == 'approved' %}{% set isApproved = true %}{% endif %}
+{#                                {% set isApproved = false %}#}
+{#                                {% for proof in file.getProofs() %}#}
+{#                                    {% if proof.status == 'approved' %}{% set isApproved = true %}{% endif %}#}
 
-        {#                            {% include 'orderAssets/fieldtype/_row' with {#}
-        {#                                proof: proof#}
-        {#                            } only %}#}
+{#        #}{#                            {% include 'orderAssets/fieldtype/_row' with #}{#}#}
+{#        #}{#                                proof: proof#}
+{#        #}{#                            } only %}#}
 
-                                {% endfor %}
+{#                                {% endfor %}#}
 
-                                {# TODO: this is where we are up to! #}
-                                {% set volume = craft.app.getVolumes().getVolumeByUid('760c9b48-e1b8-4caa-bd14-1136c7b59160') %}
-                                {% set folder = false %}
-
-                                {% if volume %}
-                                    {% set folder = craft.app.getAssets().getRootFolderByVolumeId(volume.id) %}
-                                {% endif %}
+                                {% set folderSource = craft.printShop.getProofsFolderSourceForOrder(order.shortNumber) %}
 
                                 <proofs :proofs="'{{ file.getProofs()|e('js') }}'"
                                         :line-item-id="{{ lineItem.id }}"
-                                        :source="'folder:{{ folder.uid }}'">
+                                        :source="'{{ folderSource }}'">
 
                                     <div slot="AssetSelectInput">
                                         {{ forms.elementSelectField({
@@ -104,7 +98,7 @@
                                             name: 'newProof['~lineItem.id~'][asset]',
                                             elementType: 'craft\\elements\\Asset',
                                             selectionLabel: "Add a file"|t('app'),
-                                            sources: ['folder:'~folder.uid],
+                                            sources: [folderSource],
                                             criteria: { kind: ['image'] },
                                             limit: 1,
                                             elements: null,

@@ -33,18 +33,12 @@
     mounted() {
       this.$nextTick(function () {
         new Craft.AssetSelectInput({
-          criteria: { kind: ['image'] },
           elementType: "craft\\elements\\Asset",
-          fieldId: null,
           id: "newProof-"+this.lineItemId+"-asset",
           limit: 1,
           modalStorageKey: null,
           name: "newProof["+this.lineItemId+"][asset]",
-          showSiteMenu: false,
-          sortable: true,
-          sourceElementId: null,
           sources: [this.source],
-          viewMode: "list"
         });
       })
     }

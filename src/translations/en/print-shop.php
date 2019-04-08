@@ -24,5 +24,10 @@ return [
     'Customer Note' => 'Customer Note',
     'Files and Proofs Location' => 'Files and Proofs Location',
     'Where do you want to store line item files and proofs' => 'Where do you want to store line item files and proofs',
+    'Customer Files' => 'Customer Files',
     'Customer-Files' => 'Customer-Files',
+    'Proofs' => 'Proofs',
+    'Root folder not found' => 'Root folder not found',
+    'Order folder not found' => 'Order folder not found',
+    'Proofs folder not found' => 'Proofs folder not found',
 ];

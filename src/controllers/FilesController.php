@@ -113,7 +113,7 @@ class FilesController extends Controller
         // Try for the customer files folder - in case it already exists
         $customerFilesFolder = $assets->findFolder([
             'parentId' => $orderFolder->id,
-            'name' => Craft::t('print-shop','Customer-Files'),
+            'name' => Craft::t('print-shop','Customer Files'),
             'path' => $orderFolder->path.'/'.Craft::t('print-shop','Customer-Files'),
         ]);
 
@@ -122,7 +122,7 @@ class FilesController extends Controller
             // We didn’t, so create it
             try {
                 $folderModel = new VolumeFolder();
-                $folderModel->name = Craft::t('print-shop','Customer-Files');
+                $folderModel->name = Craft::t('print-shop','Customer Files');
                 $folderModel->parentId = $orderFolder->id;
                 $folderModel->volumeId = $orderFolder->volumeId;
                 $folderModel->path = $orderFolder->path.'/'.Craft::t('print-shop','Customer-Files');
@@ -137,6 +137,40 @@ class FilesController extends Controller
 
         // Final customer files folder check
         if (!$customerFilesFolder) {
+            return $this->asErrorJson(Craft::t('print-shop', 'Unable to upload files at this time.'));
+        }
+
+
+        /**
+         * Also make a folder for the proofs whilst we’re here
+         */
+        // Try for the proofs files folder - in case it already exists
+        $proofsFolder = $assets->findFolder([
+            'parentId' => $orderFolder->id,
+            'name' => Craft::t('print-shop','Proofs'),
+            'path' => $orderFolder->path.'/'.Craft::t('print-shop','Proofs'),
+        ]);
+
+        // Check if we got one
+        if (!$proofsFolder) {
+            // We didn’t, so create it
+            try {
+                $folderModel = new VolumeFolder();
+                $folderModel->name = Craft::t('print-shop','Proofs');
+                $folderModel->parentId = $orderFolder->id;
+                $folderModel->volumeId = $orderFolder->volumeId;
+                $folderModel->path = $orderFolder->path.'/'.Craft::t('print-shop','Proofs');
+
+                $assets->createFolder($folderModel);
+
+                $proofsFolder = $folderModel;
+            } catch (AssetException $exception) {
+                return $this->asErrorJson($exception->getMessage());
+            }
+        }
+
+        // Final proofs folder check
+        if (!$proofsFolder) {
             return $this->asErrorJson(Craft::t('print-shop', 'Unable to upload files at this time.'));
         }
 
