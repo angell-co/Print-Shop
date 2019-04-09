@@ -42,6 +42,7 @@ class ProofsController extends Controller
         $this->requirePostRequest();
         $this->requireAcceptsJson();
 
+        Craft::dd('got to the save!');
 
         // TODO
 //

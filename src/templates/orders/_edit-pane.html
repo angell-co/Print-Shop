@@ -79,9 +79,9 @@
 {#                                {% for proof in file.getProofs() %}#}
 {#                                    {% if proof.status == 'approved' %}{% set isApproved = true %}{% endif %}#}
 
-{#        #}{#                            {% include 'orderAssets/fieldtype/_row' with #}{#}#}
-{#        #}{#                                proof: proof#}
-{#        #}{#                            } only %}#}
+{#                                    {% include 'orderAssets/fieldtype/_row' with }#}
+{#                                        proof: proof#}
+{#                                    } only %}#}
 
 {#                                {% endfor %}#}
 
@@ -102,7 +102,7 @@
                                             criteria: { kind: ['image'] },
                                             limit: 1,
                                             elements: null,
-                                            jsClass : 'Craft.AssetSelectInput'
+                                            jsClass: 'Craft.AssetSelectInput'
                                         }) }}
                                     </div>
 

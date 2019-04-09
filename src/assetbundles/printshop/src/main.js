@@ -5,6 +5,8 @@
 import Vue from 'vue'
 import Proofs from './components/Proofs.vue'
 
+import './main.scss';
+
 Garnish.$doc.ready(function() {
   Craft.initUiElements()
 
