@@ -30,4 +30,6 @@ return [
     'Root folder not found' => 'Root folder not found',
     'Order folder not found' => 'Order folder not found',
     'Proofs folder not found' => 'Proofs folder not found',
+    'Missing required line item.' => 'Missing required line item.',
+    'You must add a file.' => 'You must add a file.'
 ];

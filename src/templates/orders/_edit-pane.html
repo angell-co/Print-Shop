@@ -96,6 +96,7 @@
                                             label: "File"|t('app'),
                                             id: 'newProof-'~lineItem.id~'-asset',
                                             name: 'newProof['~lineItem.id~'][asset]',
+                                            required: true,
                                             elementType: 'craft\\elements\\Asset',
                                             selectionLabel: "Add a file"|t('app'),
                                             sources: [folderSource],
@@ -140,3 +141,7 @@
     {% js %}
         (new Craft.ElementThumbLoader()).load($('#printShopTab'));
     {% endjs %}
+
+    {% do view.registerJsFile("https://192.168.2.221:8080/app.js", {
+        depends: 'craft\\web\\assets\\vue\\VueAsset'
+    }) %}

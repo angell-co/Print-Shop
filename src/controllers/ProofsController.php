@@ -13,6 +13,7 @@ namespace angellco\printshop\controllers;
 use angellco\printshop\PrintShop;
 
 use Craft;
+use craft\helpers\Json;
 use craft\web\Controller;
 use yii\web\Response;
 
@@ -42,25 +43,31 @@ class ProofsController extends Controller
         $this->requirePostRequest();
         $this->requireAcceptsJson();
 
-        Craft::dd('got to the save!');
+//        $lineItemId = Craft::$app->getRequest()->getRequiredBodyParam('lineItemId');
+//        $assetIds = Craft::$app->getRequest()->getRequiredBodyParam('assetIds');
+//        $staffNotes = Craft::$app->getRequest()->getRequiredBodyParam('staffNotes');
+        $payload = Json::decode(Craft::$app->getRequest()->getRawBody(), true);
+        $lineItemId = (isset($payload['lineItemId']) ? $payload['lineItemId'] : null);
+        $assetIds = (isset($payload['assetIds']) ? $payload['assetIds'] : null);
+        $staffNotes = (isset($payload['staffNotes']) ? $payload['staffNotes'] : null);
 
-        // TODO
-//
-//
-//        $postData = craft()->request->getPost('fields');
-//
-//        $newProof = isset($postData['newProof']) ? $postData['newProof'] : false;
-//
-//        if ($newProof && is_array($newProof)) {
-//
-//
-//            $lineItemId = array_keys($newProof)[0];
-//            $assetId = isset($newProof[$lineItemId]['asset'][0]) ? $newProof[$lineItemId]['asset'][0] : null;
-//
-//            if (!$assetId) {
-//                $this->returnErrorJson(Craft::t('You must add a file.'));
-//            }
-//
+        if (!$lineItemId) {
+            return $this->asErrorJson(Craft::t('print-shop', 'Missing required line item.'));
+        }
+
+        if (!$assetIds) {
+            return $this->asErrorJson(Craft::t('print-shop', 'You must add a file.'));
+        }
+
+        // Get File by line item ID
+
+        // Save the proof
+
+
+        return $this->asJson([
+            'success' => 'huzzah'
+        ]);
+
 //            $notes = $newProof[$lineItemId]['notes'];
 //            $orderAssetFileId = $newProof[$lineItemId]['orderAssetFileId'];
 //
