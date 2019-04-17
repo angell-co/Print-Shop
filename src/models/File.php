@@ -118,11 +118,13 @@ class File extends Model
     /**
      * Returns all the proofs this File
      *
-     * @return array|bool
+     * @param bool $expandProofMethods
+     *
+     * @return array
      */
-    public function getProofs()
+    public function getProofs($expandProofMethods = false)
     {
-        return PrintShop::$plugin->proofs->getProofsByFileId($this->id);
+        return PrintShop::$plugin->proofs->getProofsByFileId($this->id, $expandProofMethods);
     }
 
     /**

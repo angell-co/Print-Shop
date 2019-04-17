@@ -32,10 +32,11 @@ class Proofs extends Component
      * Returns a Proof by its id
      *
      * @param null $id
+     * @param bool $expandProofMethods
      *
-     * @return bool|Proof
+     * @return Proof|bool|null
      */
-    public function getProofById($id = null)
+    public function getProofById($id = null, $expandProofMethods = false)
     {
         if (!$id) {
             return false;
@@ -45,17 +46,30 @@ class Proofs extends Component
             ->where(['id' => $id])
             ->one();
 
-        return $result ? new Proof($result) : null;
+        if (!$result) {
+            return null;
+        }
+
+        $proof = new Proof($result);
+
+        if ($expandProofMethods) {
+            $proof->setFile();
+            $proof->setAsset();
+            $proof->setDate();
+        }
+
+        return $proof;
     }
 
     /**
      * Returns a Proof by its uid
      *
      * @param null $uid
+     * @param bool $expandProofMethods
      *
-     * @return bool|Proof
+     * @return Proof|bool|null
      */
-    public function getProofByUid($uid = null)
+    public function getProofByUid($uid = null, $expandProofMethods = false)
     {
         if (!$uid) {
             return false;
@@ -65,17 +79,30 @@ class Proofs extends Component
             ->where(['uid' => $uid])
             ->one();
 
-        return $result ? new Proof($result) : null;
+        if (!$result) {
+            return null;
+        }
+
+        $proof = new Proof($result);
+
+        if ($expandProofMethods) {
+            $proof->setFile();
+            $proof->setAsset();
+            $proof->setDate();
+        }
+
+        return $proof;
     }
 
     /**
      * Returns an array of Proofs for a given File ID
      *
      * @param null $fileId
+     * @param bool $expandProofMethods
      *
      * @return array
      */
-    public function getProofsByFileId($fileId = null)
+    public function getProofsByFileId($fileId = null, $expandProofMethods = false)
     {
         if (!$fileId) {
             return [];
@@ -92,7 +119,15 @@ class Proofs extends Component
 
         $proofs = [];
         foreach ($results as $result) {
-            $proofs[] = new Proof($result);
+            $proof = new Proof($result);
+
+            if ($expandProofMethods) {
+                $proof->setFile();
+                $proof->setAsset();
+                $proof->setDate();
+            }
+
+            $proofs[] = $proof;
         }
 
         return $proofs;

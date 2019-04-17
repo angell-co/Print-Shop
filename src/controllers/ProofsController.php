@@ -14,8 +14,11 @@ use angellco\printshop\models\Proof;
 use angellco\printshop\PrintShop;
 
 use Craft;
+use craft\helpers\App;
+use craft\helpers\FileHelper;
 use craft\helpers\Json;
 use craft\web\Controller;
+use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
 /**
@@ -77,29 +80,38 @@ class ProofsController extends Controller
 
         return $this->asJson([
             'success' => true,
-            'proof' => PrintShop::$plugin->proofs->getProofById($proof->id)
+            'proof' => PrintShop::$plugin->proofs->getProofById($proof->id, true)
         ]);
+    }
 
-//            $notes = $newProof[$lineItemId]['notes'];
-//            $orderAssetFileId = $newProof[$lineItemId]['orderAssetFileId'];
-//
-//            $model = new OrderAssets_ProofModel();
-//            $model->orderAssetFileId = $orderAssetFileId;
-//            $model->assetId = $assetId;
-//            $model->notes = $notes;
-//
-//            if ($savedProof = craft()->orderAssets_proofs->saveOrderAssetProof($model)) {
-//                $this->returnJson([
-//                    'success' => true,
-//                    'rowHtml' => craft()->templates->render('orderAssets/fieldtype/_row', [
-//                        'proof' => $savedProof
-//                    ])
-//                ]);
-//            }
-//        }
-//
-//        $this->returnErrorJson(Craft::t('An unknown error occurred.'));
+    /**
+     * Downloads the Asset from a Proof model, modified from AssetsController.php
+     *
+     * @return Response
+     * @throws BadRequestHttpException
+     */
+    public function actionDownload(): Response
+    {
+        $proofUid = Craft::$app->getRequest()->getRequiredParam('uid');
 
+        $proof = PrintShop::$plugin->proofs->getProofByUid($proofUid);
+        if (!$proof) {
+            throw new BadRequestHttpException(Craft::t('print-shop', 'The Proof you’re trying to access does not exist.'));
+        }
+
+        $asset = $proof->getAsset();
+        if (!$asset) {
+            throw new BadRequestHttpException(Craft::t('app', 'The Asset you’re trying to download does not exist.'));
+        }
+
+        // All systems go, engage hyperdrive! (so PHP doesn't interrupt our stream)
+        App::maxPowerCaptain();
+        $localPath = $asset->getCopyOfFile();
+
+        $response = Craft::$app->getResponse()->sendFile($localPath, $asset->filename);
+        FileHelper::unlink($localPath);
+
+        return $response;
     }
 
 

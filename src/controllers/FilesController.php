@@ -267,7 +267,7 @@ class FilesController extends Controller
 //    }
 
     /**
-     * Downloads a file, modified from AssetsController.php
+     * Downloads the Asset from a File model, modified from AssetsController.php
      *
      * @return Response
      * @throws BadRequestHttpException

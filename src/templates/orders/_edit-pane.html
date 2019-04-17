@@ -79,7 +79,7 @@
 
                                 {% set folderSource = craft.printShop.getProofsFolderSourceForOrder(order.shortNumber) %}
 
-                                <proofs :proofs="{{ file.getProofs()|json_encode }}"
+                                <proofs :proofs="{{ file.getProofs(true)|json_encode }}"
                                         :line-item-id="{{ lineItem.id }}"
                                         :source="'{{ folderSource }}'">
 

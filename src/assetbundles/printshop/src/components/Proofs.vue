@@ -13,9 +13,11 @@
       <tbody>
         <tr v-for="proof in proofsList" :key="proof.uid">
           <th>{{proof.id}}</th>
-          <td>{{proof.assetId}}</td>
+          <td>
+            <a :href="proof.uid|assetDownload">{{proof.asset.filename}}</a>
+          </td>
           <td>{{proof.status}}</td>
-          <td>{{proof.dateCreated}}</td>
+          <td width="220px">{{proof.date|date}}</td>
           <td>
             <div v-if="proof.staffNotes">
               <strong>Staff Notes:</strong><br>
@@ -60,6 +62,7 @@
 <script>
 
   import axios from 'axios';
+  import moment from 'moment';
 
   export default {
     name: 'proofs',
@@ -75,6 +78,16 @@
     },
     mounted() {
       Craft.initUiElements();
+    },
+    filters: {
+      date: function (date) {
+        return moment(date).format('MMMM Do YYYY, h:mm a');
+      },
+      assetDownload: function(uid) {
+        return Craft.getActionUrl('print-shop/proofs/download', {
+          uid: uid
+        });
+      }
     },
     methods: {
       onShowProofForm () {

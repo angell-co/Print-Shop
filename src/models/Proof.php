@@ -14,6 +14,7 @@ use angellco\printshop\PrintShop;
 
 use Craft;
 use craft\base\Model;
+use craft\helpers\DateTimeHelper;
 
 /**
  * @author    Angell & Co
@@ -77,6 +78,14 @@ class Proof extends Model
      */
     public $uid;
 
+    public $file;
+    public $asset;
+
+    /**
+     * @var string
+     */
+    public $date;
+
     // Public Methods
     // =========================================================================
 
@@ -87,7 +96,23 @@ class Proof extends Model
      */
     public function getFile()
     {
-        return PrintShop::$plugin->files->getFileById($this->fileId);
+        if (!$this->file) {
+            $this->setFile();
+        }
+
+        return $this->file;
+    }
+
+    /**
+     * Setter for $file
+     *
+     * @param null $file
+     */
+    public function setFile($file = null)
+    {
+        if (!$this->file) {
+            $this->file = PrintShop::$plugin->files->getFileById($this->fileId);
+        }
     }
 
     /**
@@ -97,7 +122,49 @@ class Proof extends Model
      */
     public function getAsset()
     {
-        return Craft::$app->getAssets()->getAssetById($this->assetId);
+        if (!$this->asset) {
+            $this->setAsset();
+        }
+
+        return $this->asset;
+    }
+
+    /**
+     * Setter for $asset
+     *
+     * @param null $asset
+     */
+    public function setAsset($asset = null)
+    {
+        if ($asset === null) {
+            $this->asset = Craft::$app->getAssets()->getAssetById($this->assetId);
+        }
+    }
+
+    /**
+     * Returns the dateCreated prop as an ISO-8601 string
+     *
+     * @return false|string
+     */
+    public function getDate()
+    {
+        if (!$this->date) {
+            $this->setDate();
+        }
+
+        return $this->date;
+    }
+
+    /**
+     * Setter for $date
+     *
+     * @param null $date
+     */
+    public function setDate($date = null)
+    {
+        if ($date === null) {
+            $this->date = DateTimeHelper::toIso8601($this->dateCreated);
+        }
     }
 
     /**
