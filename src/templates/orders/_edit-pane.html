@@ -75,19 +75,9 @@
                         <td data-title="{{ 'Proofs'|t('print-shop') }}">
                             {% if file %}
 
-{#                                {% set isApproved = false %}#}
-{#                                {% for proof in file.getProofs() %}#}
-{#                                    {% if proof.status == 'approved' %}{% set isApproved = true %}{% endif %}#}
-
-{#                                    {% include 'orderAssets/fieldtype/_row' with }#}
-{#                                        proof: proof#}
-{#                                    } only %}#}
-
-{#                                {% endfor %}#}
-
                                 {% set folderSource = craft.printShop.getProofsFolderSourceForOrder(order.shortNumber) %}
 
-                                <proofs :proofs="'{{ file.getProofs()|e('js') }}'"
+                                <proofs :proofs="{{ file.getProofs()|json_encode }}"
                                         :line-item-id="{{ lineItem.id }}"
                                         :source="'{{ folderSource }}'">
 

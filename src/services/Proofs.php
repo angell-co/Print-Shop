@@ -73,21 +73,21 @@ class Proofs extends Component
      *
      * @param null $fileId
      *
-     * @return array|bool
+     * @return array
      */
     public function getProofsByFileId($fileId = null)
     {
         if (!$fileId) {
-            return false;
+            return [];
         }
 
         $results = ProofRecord::find()
             ->where(['fileId' => $fileId])
-            ->orderBy('dateCreated desc')
+            ->orderBy('dateCreated asc')
             ->all();
 
         if (!$results) {
-            return false;
+            return [];
         }
 
         $proofs = [];

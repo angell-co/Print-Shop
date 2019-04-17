@@ -1,5 +1,17 @@
 <template>
   <div>
+    <table class="data fullwidth">
+      <tbody>
+        <tr v-for="proof in proofsList" :key="proof.uid">
+          <td>{{proof.id}}</td>
+          <td>{{proof.assetId}}</td>
+          <td>{{proof.dateCreated}}</td>
+          <td>{{proof.staffNotes}}</td>
+          <td>{{proof.customerNotes}}</td>
+        </tr>
+      </tbody>
+    </table>
+
 
     <div class="btn submit"
          role="button"
@@ -39,7 +51,8 @@
         assetSelectInput: null,
         working: false,
         error: null,
-        showProofForm: false
+        showProofForm: false,
+        proofsList: this.proofs
       };
     },
     mounted() {
@@ -84,7 +97,10 @@
           if (response.data.error) {
             this.error = response.data.error;
           } else {
-            // success
+            // Add proof to the stack
+            this.proofsList.push(response.data.proof);
+            // Close the form
+            this.showProofForm = false;
           }
 
           return console.log(response.data);

@@ -10,6 +10,7 @@
 
 namespace angellco\printshop\controllers;
 
+use angellco\printshop\models\Proof;
 use angellco\printshop\PrintShop;
 
 use Craft;
@@ -43,9 +44,6 @@ class ProofsController extends Controller
         $this->requirePostRequest();
         $this->requireAcceptsJson();
 
-//        $lineItemId = Craft::$app->getRequest()->getRequiredBodyParam('lineItemId');
-//        $assetIds = Craft::$app->getRequest()->getRequiredBodyParam('assetIds');
-//        $staffNotes = Craft::$app->getRequest()->getRequiredBodyParam('staffNotes');
         $payload = Json::decode(Craft::$app->getRequest()->getRawBody(), true);
         $lineItemId = (isset($payload['lineItemId']) ? $payload['lineItemId'] : null);
         $assetIds = (isset($payload['assetIds']) ? $payload['assetIds'] : null);
@@ -60,12 +58,26 @@ class ProofsController extends Controller
         }
 
         // Get File by line item ID
+        $lineItemFile = PrintShop::$plugin->files->getFileByLineItemId($lineItemId);
+
+        if (!$lineItemFile) {
+            return $this->asErrorJson(Craft::t('print-shop', 'Couldn’t get custom file.'));
+        }
 
         // Save the proof
+        $proof = new Proof();
+        $proof->fileId = $lineItemFile->id;
+        $proof->assetId = $assetIds[0];
+        $proof->status = Proof::STATUS_NEW;
+        $proof->staffNotes = $staffNotes;
 
+        if (!PrintShop::$plugin->proofs->saveProof($proof)) {
+            return $this->asErrorJson(Craft::t('print-shop', 'Couldn’t save proof.'));
+        }
 
         return $this->asJson([
-            'success' => 'huzzah'
+            'success' => true,
+            'proof' => PrintShop::$plugin->proofs->getProofById($proof->id)
         ]);
 
 //            $notes = $newProof[$lineItemId]['notes'];

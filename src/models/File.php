@@ -122,24 +122,8 @@ class File extends Model
      */
     public function getProofs()
     {
-
-        // TODO - needs service
-//        return PrintShop::$plugin->proofs->getProofsForFile($this->id);
-
-//        $records = OrderAssets_ProofRecord::model()->findAllByAttributes([
-//            'orderAssetFileId' => $this->id
-//        ]);
-//
-//        if (!$records) {
-//            return false;
-//        }
-//
-//        return OrderAssets_ProofModel::populateModels($records);
+        return PrintShop::$plugin->proofs->getProofsByFileId($this->id);
     }
-
-
-
-
 
     /**
      * @inheritdoc

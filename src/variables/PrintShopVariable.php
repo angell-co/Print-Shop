@@ -42,13 +42,13 @@ class PrintShopVariable
     /**
      * Returns a Proof model by its uid
      *
-     * @param string $number
+     * @param string $uid
      *
      * @return mixed
      */
-    public function getProof($number)
+    public function getProof($uid)
     {
-        //
+        return PrintShop::$plugin->proofs->getProofByUid($uid);
     }
 
     /**
