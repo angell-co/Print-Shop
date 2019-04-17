@@ -1,13 +1,31 @@
 <template>
   <div>
     <table class="data fullwidth">
+      <thead>
+        <tr>
+          <th></th>
+          <th>File</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
       <tbody>
         <tr v-for="proof in proofsList" :key="proof.uid">
-          <td>{{proof.id}}</td>
+          <th>{{proof.id}}</th>
           <td>{{proof.assetId}}</td>
+          <td>{{proof.status}}</td>
           <td>{{proof.dateCreated}}</td>
-          <td>{{proof.staffNotes}}</td>
-          <td>{{proof.customerNotes}}</td>
+          <td>
+            <div v-if="proof.staffNotes">
+              <strong>Staff Notes:</strong><br>
+              {{proof.staffNotes}}
+            </div>
+            <div v-if="proof.customerNotes">
+              <strong>Customer Notes:</strong><br>
+              {{proof.customerNotes}}
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -19,7 +37,7 @@
          @click="onShowProofForm()">Add proof</div>
 
     <div class="pane" v-if="showProofForm">
-      <table class="data fullwidth">
+      <table class="proofform data fullwidth">
         <tbody>
           <tr>
             <td width="200px">
@@ -117,7 +135,13 @@
 </script>
 
 <style scoped type="text/scss">
-  table.data tbody tr td {
+  table.data tbody tr td,
+  table.data tbody tr th {
+    border-top: 0;
+    vertical-align: top;
+  }
+
+  table.proofform.data tbody tr td {
     vertical-align: top;
     border-bottom: 0;
     border-top: 0;
@@ -130,8 +154,13 @@
     vertical-align: baseline;
   }
 
+  .pane {
+    margin-top: 24px;
+    margin-bottom: 24px !important;
+  }
+
   @media only screen and (max-width: 1600px) {
-    table.data tbody tr td {
+    table.proofform.data tbody tr td {
       display: block;
       padding-left: 0 !important;
       margin-bottom: 14px;

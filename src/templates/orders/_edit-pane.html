@@ -11,11 +11,10 @@
             <table id="printshop-maintable" class="data fullwidth collapsible">
                 <thead>
                     <tr>
-                        <th scope="col">{{ 'Item'|t('commerce') }}</th>
+                        <th scope="col" colspan="2">{{ 'Item'|t('commerce') }}</th>
                         <th scope="col">{{ 'File'|t('print-shop') }}</th>
                         <th scope="col">{{ 'Customer Note'|t('print-shop') }}</th>
                         <th scope="col">{{ 'Proofs'|t('print-shop') }}</th>
-                        <th scope="col"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -55,6 +54,9 @@
                                 {% endfor %}
                                 </span>
                             {% endif %}
+                        </td>
+                        <td>
+                            <span class="tableRowInfo" data-icon="info" href="#"></span>
                         </td>
                         <td data-title="{{ 'File'|t('print-shop') }}">
                             {% set file = craft.printShop.getFile(lineItem.id) %}
@@ -117,9 +119,6 @@
                             {% endif %}
 
                         </td>
-                        <td>
-                            <span class="tableRowInfo" data-icon="info" href="#"></span>
-                        </td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -135,6 +134,12 @@
             Craft.cp.updateResponsiveTables();
         });
     {% endjs %}
+
+    {% css %}
+        #printshop-maintable.data > tbody tr td {
+            vertical-align: top;
+        }
+    {% endcss %}
 
     {% do view.registerJsFile("https://192.168.2.221:8080/app.js", {
         depends: 'craft\\web\\assets\\vue\\VueAsset'
