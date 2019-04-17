@@ -1,27 +1,33 @@
 <template>
   <div>
-    <!--  This table (form) needs a background, some padding and a toggle to open it  -->
-    <table class="data fullwidth">
-      <tbody>
-        <tr>
-          <td width="200px">
-            <slot name="AssetSelectInput"></slot>
-          </td>
-          <td>
-            <slot name="StaffNotesField"></slot>
-          </td>
-          <td width="100px">
-            <div class="btn submit" role="button" @click="submit()">Add</div>
-            <div v-if="working" class="spinner"></div>
-          </td>
-        </tr>
-        <tr v-if="error">
-          <td colspan="3">
-            <div class="error">{{error}}</div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+
+    <button class="btn submit" type="button"
+            v-if="!showProofForm"
+            @click="showProofForm = true">Add proof</button>
+
+    <div class="pane" v-if="showProofForm">
+      <table class="data fullwidth">
+        <tbody>
+          <tr>
+            <td width="200px">
+              <slot name="AssetSelectInput"></slot>
+            </td>
+            <td>
+              <slot name="StaffNotesField"></slot>
+            </td>
+            <td width="100px">
+              <div class="btn submit" role="button" @click="submit()">Save</div>
+              <div v-if="working" class="spinner"></div>
+            </td>
+          </tr>
+          <tr v-if="error">
+            <td colspan="3">
+              <div class="error">{{error}}</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -36,7 +42,8 @@
       return {
         assetSelectInput: null,
         working: false,
-        error: null
+        error: null,
+        showProofForm: false
       };
     },
     mounted() {
