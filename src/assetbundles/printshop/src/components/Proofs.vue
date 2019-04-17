@@ -1,9 +1,10 @@
 <template>
   <div>
 
-    <button class="btn submit" type="button"
-            v-if="!showProofForm"
-            @click="showProofForm = true">Add proof</button>
+    <div class="btn submit"
+         role="button"
+         v-if="!showProofForm"
+         @click="onShowProofForm()">Add proof</div>
 
     <div class="pane" v-if="showProofForm">
       <table class="data fullwidth">
@@ -15,18 +16,13 @@
             <td>
               <slot name="StaffNotesField"></slot>
             </td>
-            <td width="100px">
-              <div class="btn submit" role="button" @click="submit()">Save</div>
-              <div v-if="working" class="spinner"></div>
-            </td>
-          </tr>
-          <tr v-if="error">
-            <td colspan="3">
-              <div class="error">{{error}}</div>
-            </td>
           </tr>
         </tbody>
       </table>
+
+      <div class="btn submit" role="button" @click="submit()">Save</div>
+      <div v-if="working" class="spinner"></div>
+      <div v-if="error" class="error">{{error}}</div>
     </div>
   </div>
 </template>
@@ -47,20 +43,22 @@
       };
     },
     mounted() {
-      this.$nextTick(function () {
-        this.assetSelectInput = new Craft.AssetSelectInput({
-          elementType: "craft\\elements\\Asset",
-          id: "newProof-"+this.lineItemId+"-asset",
-          limit: 1,
-          modalStorageKey: null,
-          name: "newProof["+this.lineItemId+"][asset]",
-          sources: [this.source],
-        });
-
-        Craft.initUiElements();
-      })
+      Craft.initUiElements();
     },
     methods: {
+      onShowProofForm () {
+        this.showProofForm = true;
+        this.$nextTick(function () {
+          this.assetSelectInput = new Craft.AssetSelectInput({
+            elementType: "craft\\elements\\Asset",
+            id: "newProof-"+this.lineItemId+"-asset",
+            limit: 1,
+            modalStorageKey: null,
+            name: "newProof["+this.lineItemId+"][asset]",
+            sources: [this.source],
+          });
+        });
+      },
       submit () {
 
         this.working = true;
@@ -109,8 +107,11 @@
     border-top: 0;
   }
 
-  table.data tbody td .btn {
+  .btn {
     margin-top: 24px;
+  }
+  .spinner {
+    vertical-align: baseline;
   }
 
   @media only screen and (max-width: 1600px) {
@@ -118,9 +119,6 @@
       display: block;
       padding-left: 0 !important;
       margin-bottom: 14px;
-    }
-    table.data tbody td .btn {
-      margin-top: 0;
     }
   }
 </style>
