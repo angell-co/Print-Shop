@@ -8,7 +8,7 @@ import Proofs from './components/Proofs.vue'
 import './main.scss';
 
 Garnish.$doc.ready(function() {
-  Craft.initUiElements()
+  Craft.initUiElements();
 
   window.printShop = new Vue({
     el: "#printshop",

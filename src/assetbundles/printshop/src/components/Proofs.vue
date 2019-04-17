@@ -1,7 +1,7 @@
 <template>
   <div>
     <!--  This table (form) needs a background, some padding and a toggle to open it  -->
-    <table class="data fullwidth collapsible">
+    <table class="data fullwidth">
       <tbody>
         <tr>
           <td width="200px">
@@ -49,6 +49,8 @@
           name: "newProof["+this.lineItemId+"][asset]",
           sources: [this.source],
         });
+
+        Craft.initUiElements();
       })
     },
     methods: {

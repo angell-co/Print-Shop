@@ -8,7 +8,7 @@
     <div id="printshop">
         {% if order.lineItems | length or order.totalPrice > 0 %}
         <div class="order-details pane">
-            <table id="" class="data fullwidth collapsible">
+            <table id="printshop-maintable" class="data fullwidth collapsible">
                 <thead>
                     <tr>
                         <th scope="col">{{ 'Item'|t('commerce') }}</th>
@@ -46,8 +46,8 @@
                             {% endif %}
                             <br><span class="code">{{ lineItem.sku }}</span>
                             {% if lineItem.options|length %}
-                                <a class="fieldtoggle first last" data-target="info-{{ lineItem.id }}">{{ "Options"|t('commerce') }}</a>
-                                <span id="info-{{ lineItem.id }}" class="hidden">
+                                <a class="fieldtoggle first last" data-target="printshop-info-{{ lineItem.id }}">{{ "Options"|t('commerce') }}</a>
+                                <span id="printshop-info-{{ lineItem.id }}" class="hidden">
                                 {% for key, option in lineItem.options %}
                                     {{ key|t('commerce') }}: {% if option is iterable %}
                                     <code>{{ option|json_encode|raw }}</code>{% else %}{{ option }}{% endif %}
@@ -139,7 +139,11 @@
     </div>
 
     {% js %}
-        (new Craft.ElementThumbLoader()).load($('#printShopTab'));
+        Garnish.$doc.ready(function() {
+            (new Craft.ElementThumbLoader()).load($('#printShopTab'));
+            Craft.cp.$collapsibleTables = Craft.cp.$collapsibleTables.add($('#printshop-maintable'));
+            Craft.cp.updateResponsiveTables();
+        });
     {% endjs %}
 
     {% do view.registerJsFile("https://192.168.2.221:8080/app.js", {
