@@ -16,7 +16,14 @@
           <td>
             <a :href="proof.uid|assetDownload">{{proof.asset.filename}}</a>
           </td>
-          <td>{{proof.status}}</td>
+          <td width="90px">
+            <span class="status" :class="{
+              white: proof.status == 'new',
+              green: proof.status == 'approved',
+              red: proof.status == 'rejected'
+            }"></span>
+            {{proof.status|capitalize}}
+          </td>
           <td width="220px">{{proof.date|date}}</td>
           <td>
             <div v-if="proof.staffNotes">
@@ -31,7 +38,6 @@
         </tr>
       </tbody>
     </table>
-
 
     <div class="btn submit"
          role="button"
@@ -87,6 +93,11 @@
         return Craft.getActionUrl('print-shop/proofs/download', {
           uid: uid
         });
+      },
+      capitalize: function (value) {
+        if (!value) return ''
+        value = value.toString()
+        return value.charAt(0).toUpperCase() + value.slice(1)
       }
     },
     methods: {
