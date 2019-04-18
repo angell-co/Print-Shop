@@ -10,8 +10,8 @@
 
 namespace angellco\printshop\controllers;
 
-use angellco\printshop\models\Proof;
 use angellco\printshop\PrintShop;
+use angellco\printshop\models\Proof;
 
 use Craft;
 use craft\helpers\App;

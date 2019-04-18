@@ -11,12 +11,12 @@
 namespace angellco\printshop\services;
 
 use angellco\printshop\models\File;
-use angellco\printshop\PrintShop;
 use angellco\printshop\records\File as FileRecord;
 
 use Craft;
 use craft\base\Component;
 use craft\elements\Asset;
+use yii\web\ServerErrorHttpException;
 
 /**
  * @author    Angell & Co
@@ -35,7 +35,7 @@ class Files extends Component
      */
     public function getAllFiles()
     {
-        $record = FileRecord::find()->all();
+        $records = FileRecord::find()->all();
 
         if (!$records) {
             return false;
@@ -106,7 +106,7 @@ class Files extends Component
      * @return bool
      * @throws \Throwable
      */
-    public function saveFile(File $file)
+    public function saveFile(File $file): bool
     {
         if ($file->id) {
             $fileRecord = FileRecord::find()
@@ -114,7 +114,7 @@ class Files extends Component
                 ->one();
 
             if (!$fileRecord) {
-                throw new Exception(Craft::t('print-shop', 'No Files exist with the ID “{id}”', ['id' => $file->id]));
+                throw new ServerErrorHttpException(Craft::t('print-shop', 'No Files exist with the ID “{id}”', ['id' => $file->id]));
             }
         } else {
             $fileRecord = new FileRecord();

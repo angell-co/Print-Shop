@@ -10,11 +10,9 @@
 
 namespace angellco\printshop\records;
 
-use angellco\printshop\PrintShop;
-
-use Craft;
 use craft\db\ActiveRecord;
 use craft\records\Asset;
+use yii\db\ActiveQueryInterface;
 
 /**
  * @author    Angell & Co

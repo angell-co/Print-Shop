@@ -11,12 +11,12 @@
 namespace angellco\printshop\services;
 
 use angellco\printshop\models\Proof;
-use angellco\printshop\PrintShop;
-
 use angellco\printshop\records\Proof as ProofRecord;
+
 use Craft;
 use craft\base\Component;
 use craft\elements\Asset;
+use yii\web\ServerErrorHttpException;
 
 /**
  * @author    Angell & Co
@@ -149,7 +149,7 @@ class Proofs extends Component
                 ->one();
 
             if (!$proofRecord) {
-                throw new Exception(Craft::t('print-shop', 'No Proofs exist with the ID “{id}”', ['id' => $proof->id]));
+                throw new ServerErrorHttpException(Craft::t('print-shop', 'No Proofs exist with the ID “{id}”', ['id' => $proof->id]));
             }
         } else {
             $proofRecord = new ProofRecord();
@@ -181,9 +181,7 @@ class Proofs extends Component
             $transaction->commit();
 
             // Before we send the email, make an order history model
-
-//            /** @var Commerce_LineItemModel $lineItem */
-//            $lineItem = $model->getOrderAssetFile()->getLineItem();
+            $lineItem = $proof->getFile()->getLineItem();
 //
 //            /** @var Commerce_OrderModel $order */
 //            $order = $lineItem->getOrder();

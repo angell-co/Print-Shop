@@ -14,7 +14,6 @@ use angellco\printshop\services\Files as FilesService;
 use angellco\printshop\services\Proofs as ProofsService;
 use angellco\printshop\variables\PrintShopVariable;
 use angellco\printshop\models\Settings;
-use angellco\printshop\fields\PrintShopField as PrintShopFieldField;
 
 use Craft;
 use craft\base\Plugin;
@@ -22,11 +21,7 @@ use craft\helpers\Db;
 use craft\helpers\UrlHelper;
 use craft\services\Plugins;
 use craft\events\PluginEvent;
-use craft\web\UrlManager;
-use craft\services\Fields;
 use craft\web\twig\variables\CraftVariable;
-use craft\events\RegisterComponentTypesEvent;
-use craft\events\RegisterUrlRulesEvent;
 
 use craft\commerce\Plugin as Commerce;
 
