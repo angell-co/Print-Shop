@@ -34,5 +34,9 @@ return [
     'You must add a file.' => 'You must add a file.',
     'Couldn’t get custom file.' => 'Couldn’t get custom file.',
     'Couldn’t save proof.' => 'Couldn’t save proof.',
-    'The Proof you’re trying to access does not exist.' => 'The Proof you’re trying to access does not exist.'
+    'The Proof you’re trying to access does not exist.' => 'The Proof you’re trying to access does not exist.',
+    'Proofs Sent' => 'Proofs Sent',
+    'Proofs Approved' => 'Proofs Approved',
+    'Proofs Rejected' => 'Proofs Rejected',
+    'Proof Update Email' => 'Proof Update Email',
 ];

@@ -40,6 +40,27 @@ class Settings extends Model
      */
     public $volumeSubpath;
 
+    /**
+     * @var string
+     */
+    public $proofsSentStatusUid;
+
+    /**
+     * @var string
+     */
+    public $proofsApprovedStatusUid;
+
+    /**
+     * @var string
+     */
+    public $proofsRejectedStatusUid;
+
+    /**
+     * @var string
+     */
+    public $proofEmailUid;
+
+
     // Public Methods
     // =========================================================================
 
@@ -53,12 +74,20 @@ class Settings extends Model
                 [
                     'volumeUid',
                     'volumeSubpath',
+                    'proofsSentStatusUid',
+                    'proofsApprovedStatusUid',
+                    'proofsRejectedStatusUid',
+                    'proofEmailUid',
                 ],
                 'string'
             ],
             [
                 [
                     'volumeUid',
+                    'proofsSentStatusUid',
+                    'proofsApprovedStatusUid',
+                    'proofsRejectedStatusUid',
+                    'proofEmailUid',
                 ],
                 'required'
             ],

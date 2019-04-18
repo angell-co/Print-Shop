@@ -15,9 +15,8 @@
 
 {% import "_includes/forms" as forms %}
 
-{% set allVolumes = craft.app.volumes.getAllVolumes() %}
 {% set volumeList = [] %}
-{% for volume in allVolumes %}
+{% for volume in volumes %}
     {% set volumeList = volumeList|merge([{'value': volume.uid, 'label': volume.name}]) %}
 {% endfor %}
 
@@ -58,3 +57,115 @@
         label: "Files and Proofs Location"|t('print-shop')
     }, '<p class="error">' ~ "No volumes exist yet."|t('app') ~ '</p>') }}
 {% endif %}
+
+{% set emailsList = [] %}
+{% for email in commerceEmails %}
+    {% set emailsList = emailsList|merge([{'value': email.uid, 'label': email.name}]) %}
+{% endfor %}
+
+{{ forms.selectField({
+    label: 'Proof Update Email'|t('print-shop'),
+    id: 'proofEmailUid',
+    name: 'proofEmailUid',
+    options: emailsList,
+    value: settings.proofEmailUid ?? null,
+}) }}
+
+<hr>
+
+<h2>Proof Statuses</h2>
+
+{% macro statusInput(orderStatuses, currentStatus, prefix) %}
+    <div>
+        <a id="{{ prefix }}-status-menu" class="btn menubtn" href="#">
+            <span class="status {{ currentStatus.color }}"></span>{{ currentStatus.name }}
+        </a>
+        <div class="menu">
+            <ul class="padded">
+                {% for status in orderStatuses %}
+                    <li>
+                        <a data-uid="{{ status.uid }}" data-color="{{ status.color }}" data-name="{{ status.name }}" {% if status.uid == currentStatus.uid %}class="sel"{% endif %} href="#">
+                            <span class="status {{ status.color }}"></span>{{ status.name }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endmacro %}
+
+{% from _self import statusInput %}
+
+{% set orderStatuses = craft.commerce.orderStatuses.getAllOrderStatuses() %}
+
+{{ forms.hidden({
+    id: 'proofsSentStatusUid',
+    name: 'proofsSentStatusUid',
+    value: proofsSentStatus.uid
+}) }}
+{{ forms.field({
+    label: 'Proofs Sent'|t('print-shop'),
+}, statusInput(orderStatuses, proofsSentStatus, 'proofsSent')) }}
+
+{{ forms.hidden({
+    id: 'proofsApprovedStatusUid',
+    name: 'proofsApprovedStatusUid',
+    value: proofsApprovedStatus.uid
+}) }}
+{{ forms.field({
+    label: 'Proofs Approved'|t('print-shop'),
+}, statusInput(orderStatuses, proofsApprovedStatus, 'proofsApproved')) }}
+
+{{ forms.hidden({
+    id: 'proofsRejectedStatusUid',
+    name: 'proofsRejectedStatusUid',
+    value: proofsRejectedStatus.uid
+}) }}
+{{ forms.field({
+    label: 'Proofs Rejected'|t('print-shop'),
+}, statusInput(orderStatuses, proofsRejectedStatus, 'proofsRejected')) }}
+
+
+
+{% js %}
+    $(function () {
+        var $proofsSentStatusMenu = $('#settings-proofsSent-status-menu');
+        new Garnish.MenuBtn($proofsSentStatusMenu, {
+            onOptionSelect: function(data){
+                var uid = $(data).data('uid'),
+                    name = $(data).data('name'),
+                    color = $(data).data('color');
+                $('#settings-proofsSentStatusUid').val(uid);
+
+                var html = "<span class='status "+color+"'></span>"+name;
+                $proofsSentStatusMenu.html(html);
+            }
+        });
+
+        var $proofsApprovedStatusMenu = $('#settings-proofsApproved-status-menu');
+        new Garnish.MenuBtn($proofsApprovedStatusMenu, {
+            onOptionSelect: function(data){
+                var uid = $(data).data('uid'),
+                    name = $(data).data('name'),
+                    color = $(data).data('color');
+                $('#settings-proofsApprovedStatusUid').val(uid);
+
+                var html = "<span class='status "+color+"'></span>"+name;
+                $proofsApprovedStatusMenu.html(html);
+            }
+        });
+
+        var $proofsRejectedStatusMenu = $('#settings-proofsRejected-status-menu');
+        new Garnish.MenuBtn($proofsRejectedStatusMenu, {
+            onOptionSelect: function(data){
+                var uid = $(data).data('uid'),
+                    name = $(data).data('name'),
+                    color = $(data).data('color');
+                $('#settings-proofsRejectedStatusUid').val(uid);
+
+                var html = "<span class='status "+color+"'></span>"+name;
+                $proofsRejectedStatusMenu.html(html);
+            }
+        });
+    });
+{% endjs %}
