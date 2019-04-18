@@ -28,11 +28,11 @@
           <td>
             <div v-if="proof.staffNotes">
               <strong>Staff Notes:</strong><br>
-              {{proof.staffNotes}}
+              <nl2br tag="p" :text="proof.staffNotes" />
             </div>
             <div v-if="proof.customerNotes">
               <strong>Customer Notes:</strong><br>
-              {{proof.customerNotes}}
+              <nl2br tag="p" :text="proof.customerNotes" />
             </div>
           </td>
         </tr>
@@ -69,10 +69,14 @@
 
   import axios from 'axios';
   import moment from 'moment';
+  import nl2br from 'vue-nl2br';
 
   export default {
     name: 'proofs',
     props: ['proofs','lineItemId','source'],
+    components: {
+      nl2br,
+    },
     data () {
       return {
         assetSelectInput: null,
