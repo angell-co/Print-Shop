@@ -15,7 +15,7 @@
  */
 return [
     'Print Shop' => 'Print Shop',
-    'Print Shop plugin loaded' => 'Print Shop plugin loaded',
+    '{name} plugin loaded' => '{name} plugin loaded',
     'Unable to upload files at this time.' => 'Unable to upload files at this time.',
     'Failed to save the file:' => 'Failed to save the file:',
     'No Files exist with the ID “{id}”' => 'No Files exist with the ID “{id}”',
@@ -23,7 +23,7 @@ return [
     'The File you’re trying to access does not exist.' => 'The File you’re trying to access does not exist.',
     'Customer Note' => 'Customer Note',
     'Files and Proofs Location' => 'Files and Proofs Location',
-    'Where do you want to store line item files and proofs' => 'Where do you want to store line item files and proofs',
+    'Where do you want to store line item files and proofs?' => 'Where do you want to store line item files and proofs?',
     'Customer Files' => 'Customer Files',
     'Customer-Files' => 'Customer-Files',
     'Proofs' => 'Proofs',
@@ -39,4 +39,10 @@ return [
     'Proofs Approved' => 'Proofs Approved',
     'Proofs Rejected' => 'Proofs Rejected',
     'Proof Update Email' => 'Proof Update Email',
+    'Couldn’t get line item for File on Proof with ID “{id}”' => 'Couldn’t get line item for File on Proof with ID “{id}”',
+    'Couldn’t get order for File on Proof with ID “{id}”' => 'Couldn’t get order for File on Proof with ID “{id}”',
+    'Proofs updated.' => 'Proofs updated.',
+    'Proof added by staff.' => 'Proof added by staff.',
+    'Proof approved by customer.' => 'Proof approved by customer.',
+    'Proof rejected by customer.' => 'Proof rejected by customer.',
 ];

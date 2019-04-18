@@ -11,11 +11,14 @@
 namespace angellco\printshop\services;
 
 use angellco\printshop\models\Proof;
+use angellco\printshop\models\Settings;
+use angellco\printshop\PrintShop;
 use angellco\printshop\records\Proof as ProofRecord;
 
 use Craft;
 use craft\base\Component;
 use craft\elements\Asset;
+use craft\helpers\Db;
 use yii\web\ServerErrorHttpException;
 
 /**
@@ -182,30 +185,44 @@ class Proofs extends Component
 
             // Before we send the email, make an order history model
             $lineItem = $proof->getFile()->getLineItem();
-//
-//            /** @var Commerce_OrderModel $order */
-//            $order = $lineItem->getOrder();
-//
-//            // Proofs sent
-//            $newStatusId = 6;
-//
-//            // Proof Approved
-//            if ($model->status === 'approved') {
-//                $newStatusId = 8;
-//            }
-//
-//            // Proof Rejected
-//            if ($model->status === 'rejected') {
-//                $newStatusId = 7;
-//            }
-//
-//            // Save the new status on the Order if its changed, this also
-//            // generates a new History line
-//            if ($order->orderStatusId !== $newStatusId) {
-//                $order->orderStatusId = $newStatusId;
-//                craft()->commerce_orders->saveOrder($order);
-//            }
-//
+            if (!$lineItem) {
+                throw new ServerErrorHttpException(Craft::t('print-shop', 'Couldn’t get line item for File on Proof with ID “{id}”', ['id' => $proof->id]));
+            }
+
+            $order = $lineItem->getOrder();
+            if (!$order) {
+                throw new ServerErrorHttpException(Craft::t('print-shop', 'Couldn’t get order for File on Proof with ID “{id}”', ['id' => $proof->id]));
+            }
+
+            // Proofs sent
+            /** @var Settings $pluginSettings */
+            $pluginSettings = PrintShop::$plugin->getSettings();
+            $statusUid = $pluginSettings->proofsSentStatusUid;
+            $message = Craft::t('print-shop', "Proof added by staff.");
+
+            // Proof Approved
+            if ($proof->status === Proof::STATUS_APPROVED) {
+                $statusUid = $pluginSettings->proofsApprovedStatusUid;
+                $message = Craft::t('print-shop', "Proof approved by customer.");
+            }
+
+            // Proof Rejected
+            if ($proof->status === Proof::STATUS_REJECTED) {
+                $statusUid = $pluginSettings->proofsRejectedStatusUid;
+                $message = Craft::t('print-shop', "Proof rejected by customer.");
+            }
+
+            // Save the status on the Order if its changed, this also
+            // generates a new History line
+            $orderStatus = $order->getOrderStatus();
+            if (!$orderStatus || $orderStatus->uid !== $statusUid) {
+                $statusId = Db::idByUid('{{%commerce_orderstatuses}}', $statusUid);
+                $order->orderStatusId = $statusId;
+                $order->message = $message;
+                Craft::$app->getElements()->saveElement($order);
+            }
+
+            // TODO: here we are
 //            // If the proof status is "new" we can try and email the customer
 //            if ($model->status === 'new') {
 //
