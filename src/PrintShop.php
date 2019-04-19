@@ -16,7 +16,11 @@ use angellco\printshop\variables\PrintShopVariable;
 use angellco\printshop\models\Settings;
 
 use Craft;
+use craft\base\Element;
 use craft\base\Plugin;
+use craft\commerce\elements\Order;
+use craft\events\RegisterElementTableAttributesEvent;
+use craft\events\SetElementTableAttributeHtmlEvent;
 use craft\helpers\Db;
 use craft\helpers\UrlHelper;
 use craft\services\Plugins;
@@ -72,6 +76,7 @@ class PrintShop extends Plugin
         self::$plugin = $this;
         self::$commerce = Commerce::getInstance();
 
+
         // Hook in to the order edit page
         Craft::$app->view->hook('cp.commerce.order.edit', function(array &$context) {
             $context['tabs'][] = [
@@ -85,6 +90,24 @@ class PrintShop extends Plugin
             return Craft::$app->view->renderTemplate('print-shop/orders/_edit-pane', $context);
         });
 
+// XXX not working!
+        // Register the proofing status attribute for the order index
+        Event::on(Order::class, Element::EVENT_REGISTER_TABLE_ATTRIBUTES, function(RegisterElementTableAttributesEvent $event) {
+            $event->tableAttributes['proofingStatus'] = ['label' => Craft::t('print-shop', 'Proofing Status')];
+        });
+        Event::on(Order::class, Element::EVENT_SET_TABLE_ATTRIBUTE_HTML, function(SetElementTableAttributeHtmlEvent $event) {
+            if ($event->attribute === 'proofingStatus') {
+                /** @var Order $order */
+                $order = $event->sender;
+
+                $event->html = PrintShop::$plugin->proofs->getProofingStatusHtml($order);
+
+                // Prevent other event listeners from getting invoked
+                $event->handled = true;
+            }
+        });
+// XXX not working!
+
         // Load up the Variable
         Event::on(
             CraftVariable::class,
@@ -95,6 +118,7 @@ class PrintShop extends Plugin
                 $variable->set('printShop', PrintShopVariable::class);
             }
         );
+
 
         // After install event
         Event::on(
@@ -110,6 +134,7 @@ class PrintShop extends Plugin
                 }
             }
         );
+
 
         // Log when the plugin init has run
         Craft::info(

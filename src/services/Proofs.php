@@ -17,6 +17,7 @@ use angellco\printshop\records\Proof as ProofRecord;
 
 use Craft;
 use craft\base\Component;
+use craft\commerce\elements\Order;
 use craft\elements\Asset;
 use craft\helpers\Db;
 use yii\web\ServerErrorHttpException;
@@ -134,6 +135,31 @@ class Proofs extends Component
         }
 
         return $proofs;
+    }
+
+    /**
+     * Returns the latest proof for this File ID
+     *
+     * @param $fileId
+     *
+     * @return Proof|bool|null
+     */
+    public function getLatestProofByFileId($fileId)
+    {
+        if (!$fileId) {
+            return false;
+        }
+
+        $result = ProofRecord::find()
+            ->where(['fileId' => $fileId])
+            ->orderBy('dateCreated asc')
+            ->one();
+
+        if (!$result) {
+            return null;
+        }
+
+        return new Proof($result);
     }
 
     /**
@@ -262,7 +288,7 @@ class Proofs extends Component
      * @return bool|int
      * @throws \Throwable
      */
-    public function deleteFileById($proofId)
+    public function deleteProofById($proofId)
     {
         if (!$proofId) {
             return false;
@@ -281,4 +307,76 @@ class Proofs extends Component
         // Delete the Proof record
         return ProofRecord::deleteAll(['id' => $proof->id]);
     }
+
+    /**
+     * Returns the status html for the order index page attributes
+     *
+     * @param Order $order
+     *
+     * @return string
+     */
+    public function getProofingStatusHtml(Order $order): string
+    {
+        $lineItemsThatNeedProofs = 0;
+        $statuses = [
+            Proof::STATUS_NEW => 0,
+            Proof::STATUS_APPROVED => 0,
+            Proof::STATUS_REJECTED => 0,
+        ];
+
+        foreach ($order->getLineItems() as $lineItem) {
+
+            $file = PrintShop::$plugin->files->getFileByLineItemId($lineItem->id);
+            if ($file) {
+
+                $lineItemsThatNeedProofs++;
+
+                $latestProof = $this->getLatestProofByFileId($file->id);
+                if ($latestProof) {
+                    $statuses[$latestProof->status]++;
+                }
+            }
+
+        }
+
+
+        // First up, are they all approved?
+        if ($lineItemsThatNeedProofs && $lineItemsThatNeedProofs === $statuses[Proof::STATUS_APPROVED]) {
+            return "<span class='status green' style='margin-right: 2px;'></span> ".Craft::t('print-shop', 'All approved');
+        }
+
+
+        // If not, we need to work out the details
+        $totalProofs = $statuses[Proof::STATUS_NEW] + $statuses[Proof::STATUS_APPROVED] + $statuses[Proof::STATUS_REJECTED];
+        $missingProofs = $lineItemsThatNeedProofs - $totalProofs;
+        $statusLines = [];
+
+        // If we have any missing entirely
+        if ($missingProofs) {
+            $statusLines[] = "<span class='status red' style='margin-right: 2px;'></span> ".Craft::t('print-shop', '{num} needed', ['num' => $missingProofs]);
+        }
+
+        // Pending
+        if ($statuses[Proof::STATUS_NEW]) {
+            $statusLines[] = "<span class='status' style='margin-right: 2px;'></span> ".Craft::t('print-shop', '{num} pending', ['num' => $statuses[Proof::STATUS_NEW]]);
+        }
+
+        // Approved
+        if ($statuses[Proof::STATUS_APPROVED]) {
+            $statusLines[] = "<span class='status green' style='margin-right: 2px;'></span> ".Craft::t('print-shop', '{num} approved', ['num' => $statuses[Proof::STATUS_APPROVED]]);
+        }
+
+        // Rejected
+        if ($statuses[Proof::STATUS_REJECTED]) {
+            $statusLines[] = "<span class='status red' style='margin-right: 2px;'></span> ".Craft::t('print-shop', '{num} rejected', ['num' => $statuses[Proof::STATUS_REJECTED]]);
+        }
+
+        // Output the array if we have anything in it
+        if (count($statuses)) {
+            return implode(', ', $statusLines);
+        }
+
+        return '';
+    }
+
 }

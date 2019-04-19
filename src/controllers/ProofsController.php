@@ -205,8 +205,7 @@ class ProofsController extends Controller
             return $this->asErrorJson(Craft::t('print-shop', 'Sorry, there was an error rejecting your proof.'));
         }
 
-        Craft::$app->session->setError(Craft::t('print-shop', 'Sorry, there was an error rejecting your proof.'));
-        return null;
+        throw new ServerErrorHttpException(Craft::t('print-shop', 'Sorry, there was an error rejecting your proof.'));
     }
 
     // Private Methods

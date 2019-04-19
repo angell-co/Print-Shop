@@ -93,26 +93,14 @@ class File extends Model
         return UrlHelper::actionUrl('print-shop/files/download', ['uid' => $this->uid]);
     }
 
-
     /**
-     * Returns the latest proof for this File
+     * Returns the latest proof for this File ID
      *
-     * @return bool|BaseModel
+     * @return Proof|bool|null
      */
     public function getLatestProof()
     {
-        // TODO - needs service
-//        return PrintShop::$plugin->proofs->getLatestProofForFile($this->id);
-
-//        $record = OrderAssets_ProofRecord::model()->ordered()->findByAttributes([
-//            'orderAssetFileId' => $this->id
-//        ]);
-//
-//        if (!$record) {
-//            return false;
-//        }
-//
-//        return OrderAssets_ProofModel::populateModel($record);
+        return PrintShop::$plugin->proofs->getLatestProofByFileId($this->id);
     }
 
     /**

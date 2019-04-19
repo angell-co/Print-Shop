@@ -47,4 +47,10 @@ return [
     'Proof rejected by customer.' => 'Proof rejected by customer.',
     'Sorry, there was an error approving your proof.' => 'Sorry, there was an error approving your proof.',
     'Sorry, there was an error rejecting your proof.' => 'Sorry, there was an error rejecting your proof.',
+    'Proofing Status' => 'Proofing Status',
+    'All approved' => 'All approved',
+    '{num} needed' => '{num} needed',
+    '{num} pending' => '{num} pending',
+    '{num} approved' => '{num} approved',
+    '{num} rejected' => '{num} rejected',
 ];
