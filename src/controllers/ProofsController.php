@@ -15,11 +15,13 @@ use angellco\printshop\models\Proof;
 
 use Craft;
 use craft\helpers\App;
+use craft\helpers\Db;
 use craft\helpers\FileHelper;
 use craft\helpers\Json;
 use craft\web\Controller;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
+use yii\web\ServerErrorHttpException;
 
 /**
  * @author    Angell & Co
@@ -119,16 +121,23 @@ class ProofsController extends Controller
      *
      * @return Response|null
      * @throws BadRequestHttpException
+     * @throws ServerErrorHttpException
+     * @throws \yii\base\Exception
+     * @throws \yii\base\InvalidConfigException
      */
     public function actionApprove(): ?Response
     {
-        $proof = $this->_getProofFromPost();
+        if (Craft::$app->request->isPost || Craft::$app->request->isAjax) {
+            $proof = $this->_getProofFromPost();
+        } else {
+            $proof = $this->_getProofFromUrl();
+        }
+
         if ($proof) {
 
             $proof->status = Proof::STATUS_APPROVED;
 
             if (PrintShop::$plugin->proofs->saveProof($proof)) {
-
 
                 if (Craft::$app->request->isAjax) {
                     return $this->asJson([
@@ -136,7 +145,13 @@ class ProofsController extends Controller
                     ]);
                 }
 
-                return $this->redirectToPostedUrl();
+                if (Craft::$app->request->isPost) {
+                    return $this->redirectToPostedUrl();
+                }
+
+                $redirect = Craft::$app->request->getRequiredQueryParam('redirect');
+                $redirectUrl = Craft::$app->getSecurity()->validateData($redirect);
+                return $this->redirect($redirectUrl);
             }
         }
 
@@ -144,8 +159,7 @@ class ProofsController extends Controller
             return $this->asErrorJson(Craft::t('print-shop', 'Sorry, there was an error approving your proof.'));
         }
 
-        Craft::$app->session->setError(Craft::t('print-shop', 'Sorry, there was an error approving your proof.'));
-        return null;
+        throw new ServerErrorHttpException(Craft::t('print-shop', 'Sorry, there was an error approving your proof.'));
     }
 
     /**
@@ -153,10 +167,17 @@ class ProofsController extends Controller
      *
      * @return Response|null
      * @throws BadRequestHttpException
+     * @throws \yii\base\Exception
+     * @throws \yii\base\InvalidConfigException
      */
     public function actionReject(): ?Response
     {
-        $proof = $this->_getProofFromPost();
+        if (Craft::$app->request->isPost || Craft::$app->request->isAjax) {
+            $proof = $this->_getProofFromPost();
+        } else {
+            $proof = $this->_getProofFromUrl();
+        }
+
         if ($proof) {
 
             $proof->status = Proof::STATUS_REJECTED;
@@ -170,7 +191,13 @@ class ProofsController extends Controller
                     ]);
                 }
 
-                return $this->redirectToPostedUrl();
+                if (Craft::$app->request->isPost) {
+                    return $this->redirectToPostedUrl();
+                }
+
+                $redirect = Craft::$app->request->getRequiredQueryParam('redirect');
+                $redirectUrl = Craft::$app->getSecurity()->validateData($redirect);
+                return $this->redirect($redirectUrl);
             }
         }
 
@@ -203,5 +230,16 @@ class ProofsController extends Controller
 
         return false;
     }
-    
+
+    /**
+     * Preps the proof from the URL
+     *
+     * @return Proof|bool|null
+     * @throws BadRequestHttpException
+     */
+    private function _getProofFromUrl()
+    {
+        $proofUid = Craft::$app->request->getRequiredParam('proofUid');
+        return PrintShop::$plugin->proofs->getProofByUid($proofUid);
+    }
 }
