@@ -45,4 +45,6 @@ return [
     'Proof added by staff.' => 'Proof added by staff.',
     'Proof approved by customer.' => 'Proof approved by customer.',
     'Proof rejected by customer.' => 'Proof rejected by customer.',
+    'Sorry, there was an error approving your proof.' => 'Sorry, there was an error approving your proof.',
+    'Sorry, there was an error rejecting your proof.' => 'Sorry, there was an error rejecting your proof.',
 ];

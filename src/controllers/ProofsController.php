@@ -114,97 +114,94 @@ class ProofsController extends Controller
         return $response;
     }
 
+    /**
+     * Approves an existing proof
+     *
+     * @return Response|null
+     * @throws BadRequestHttpException
+     */
+    public function actionApprove(): ?Response
+    {
+        $proof = $this->_getProofFromPost();
+        if ($proof) {
+
+            $proof->status = Proof::STATUS_APPROVED;
+
+            if (PrintShop::$plugin->proofs->saveProof($proof)) {
 
 
-//    /**
-//     * Approves an existing proof
-//     *
-//     * @throws HttpException
-//     */
-//    public function actionApprove()
-//    {
-//        $proof = $this->_getProofFromPost();
-//
-//        if ($proof) {
-//
-//            $proof->status = 'approved';
-//
-//            if (craft()->orderAssets_proofs->saveOrderAssetProof($proof)) {
-//
-//
-//                if (craft()->request->isAjaxRequest) {
-//                    $this->returnJson([
-//                        'success' => true,
-//                    ]);
-//                }
-//                $this->redirectToPostedUrl();
-//            }
-//        }
-//
-//        if (craft()->request->isAjaxRequest) {
-//            $this->returnJson([
-//                'error' => 'Sorry there was an error updating your proof.'
-//            ]);
-//        }
-//        craft()->userSession->setError(Craft::t('Sorry there was an error updating your proof.'));
-//
-//    }
-//
-//    /**
-//     * Rejects an existing proof
-//     *
-//     * @throws HttpException
-//     */
-//    public function actionReject()
-//    {
-//        $proof = $this->_getProofFromPost();
-//
-//        if ($proof) {
-//
-//            $proof->status = 'rejected';
-//
-//            if (craft()->orderAssets_proofs->saveOrderAssetProof($proof)) {
-//
-//
-//                if (craft()->request->isAjaxRequest) {
-//                    $this->returnJson([
-//                        'success' => true,
-//                    ]);
-//                }
-//                $this->redirectToPostedUrl();
-//            }
-//        }
-//
-//        if (craft()->request->isAjaxRequest) {
-//            $this->returnJson([
-//                'error' => 'Sorry there was an error updating your proof.'
-//            ]);
-//        }
-//        craft()->userSession->setError(Craft::t('Sorry there was an error updating your proof.'));
-//
-//    }
-//
-//
-//    // Private Methods
-//    // =========================================================================
-//
-//    /**
-//     * Preps the proof from post
-//     *
-//     * @return bool
-//     * @throws HttpException
-//     */
-//    private function _getProofFromPost()
-//    {
-//        $proofId = craft()->request->getRequiredPost('id');
-//        $proof = craft()->orderAssets_proofs->getOrderAssetProofById($proofId);
-//
-//        if ($proof) {
-//            $proof->customerNotes = craft()->request->getPost('notes');
-//            return $proof;
-//        }
-//
-//        return false;
-//    }
+                if (Craft::$app->request->isAjax) {
+                    return $this->asJson([
+                        'success' => true,
+                    ]);
+                }
+
+                return $this->redirectToPostedUrl();
+            }
+        }
+
+        if (Craft::$app->request->isAjax) {
+            return $this->asErrorJson(Craft::t('print-shop', 'Sorry, there was an error approving your proof.'));
+        }
+
+        Craft::$app->session->setError(Craft::t('print-shop', 'Sorry, there was an error approving your proof.'));
+        return null;
+    }
+
+    /**
+     * Rejects an existing proof
+     *
+     * @return Response|null
+     * @throws BadRequestHttpException
+     */
+    public function actionReject(): ?Response
+    {
+        $proof = $this->_getProofFromPost();
+        if ($proof) {
+
+            $proof->status = Proof::STATUS_REJECTED;
+
+            if (PrintShop::$plugin->proofs->saveProof($proof)) {
+
+
+                if (Craft::$app->request->isAjax) {
+                    return $this->asJson([
+                        'success' => true,
+                    ]);
+                }
+
+                return $this->redirectToPostedUrl();
+            }
+        }
+
+        if (Craft::$app->request->isAjax) {
+            return $this->asErrorJson(Craft::t('print-shop', 'Sorry, there was an error rejecting your proof.'));
+        }
+
+        Craft::$app->session->setError(Craft::t('print-shop', 'Sorry, there was an error rejecting your proof.'));
+        return null;
+    }
+
+    // Private Methods
+    // =========================================================================
+
+    /**
+     * Preps the proof from post
+     *
+     * @return bool
+     * @throws BadRequestHttpException
+     */
+    private function _getProofFromPost()
+    {
+        $proofId = Craft::$app->request->getRequiredParam('proofId');
+        $proof = PrintShop::$plugin->proofs->getProofById($proofId);
+
+        if ($proof) {
+            $proof->customerNotes = Craft::$app->request->getParam('customerNotes');
+            return $proof;
+        }
+
+        return false;
+    }
     
 }
