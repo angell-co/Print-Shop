@@ -10,9 +10,9 @@
 
 namespace angellco\printshop\services;
 
+use angellco\printshop\PrintShop;
 use angellco\printshop\models\Proof;
 use angellco\printshop\models\Settings;
-use angellco\printshop\PrintShop;
 use angellco\printshop\records\Proof as ProofRecord;
 
 use Craft;
@@ -176,9 +176,12 @@ class Proofs extends Component
             // Save it!
             $proofRecord->save(false);
 
-            // Now that we have an ID, save it on the model
+            // Now that we have IDs, save them on the model
             if (!$proof->id) {
                 $proof->id = $proofRecord->id;
+            }
+            if (!$proof->uid) {
+                $proof->uid = $proofRecord->uid;
             }
 
             $transaction->commit();
@@ -222,25 +225,26 @@ class Proofs extends Component
                 Craft::$app->getElements()->saveElement($order);
             }
 
-            // TODO: here we are
-//            // If the proof status is "new" we can try and email the customer
-//            if ($model->status === 'new') {
-//
-//                // Get the email
-//                /** @var Commerce_EmailModel $email */
-//                $email = craft()->commerce_emails->getEmailById(5);
-//                if ($email) {
-//
-//                    // Smush the proof onto the message field ... :/
-//                    $order->message = ['proof' => $model];
-//
-//                    $orderHistories = $order->getHistories();
-//                    $orderHistory = $orderHistories[0];
-//
-//                    craft()->commerce_emails->sendEmail($email, $order, $orderHistory);
-//                }
-//
-//            }
+            // If the proof status is "new" we can try and email the customer
+            if ($proof->status === Proof::STATUS_NEW) {
+
+                // Get the email
+                $emailId = Db::idByUid('{{%commerce_emails}}', $pluginSettings->proofEmailUid);
+                $email = PrintShop::$commerce->emails->getEmailById($emailId);
+                if ($email) {
+
+                    // Smush the proof onto the order history ... :/
+                    $orderHistories = $order->getHistories();
+                    $orderHistory = $orderHistories[0];
+                    $orderHistory->message = [
+                        'proof' => $proof
+                    ];
+
+                    // Send the email
+                    PrintShop::$commerce->emails->sendEmail($email, $order, $orderHistory);
+                }
+
+            }
 
         } catch (\Throwable $e) {
             $transaction->rollBack();
