@@ -152,7 +152,7 @@ class Proofs extends Component
 
         $result = ProofRecord::find()
             ->where(['fileId' => $fileId])
-            ->orderBy('dateCreated asc')
+            ->orderBy('dateCreated desc')
             ->one();
 
         if (!$result) {
