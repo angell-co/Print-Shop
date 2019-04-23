@@ -10,8 +10,8 @@
 
 namespace angellco\printshop;
 
-use angellco\printshop\services\Files as FilesService;
-use angellco\printshop\services\Proofs as ProofsService;
+use angellco\printshop\services\Files;
+use angellco\printshop\services\Proofs;
 use angellco\printshop\variables\PrintShopVariable;
 use angellco\printshop\models\Settings;
 
@@ -38,8 +38,8 @@ use yii\base\Event;
  * @package   PrintShop
  * @since     2.0.0
  *
- * @property  FilesService $files
- * @property  ProofsService $proofs
+ * @property  Files $files
+ * @property  Proofs $proofs
  */
 class PrintShop extends Plugin
 {
@@ -86,27 +86,29 @@ class PrintShop extends Plugin
             ];
         });
         Craft::$app->view->hook('cp.commerce.order.edit.main-pane', function(array &$context) {
+// DEBUG
 //            Craft::$app->view->registerAssetBundle("angellco\\printshop\\assetbundles\\printshop\\PrintShopAsset");
             return Craft::$app->view->renderTemplate('print-shop/orders/_edit-pane', $context);
         });
 
-// XXX not working!
         // Register the proofing status attribute for the order index
-        Event::on(Order::class, Element::EVENT_REGISTER_TABLE_ATTRIBUTES, function(RegisterElementTableAttributesEvent $event) {
-            $event->tableAttributes['proofingStatus'] = ['label' => Craft::t('print-shop', 'Proofing Status')];
+        Event::on(Element::class, Element::EVENT_REGISTER_TABLE_ATTRIBUTES, function(RegisterElementTableAttributesEvent $event) {
+            $event->tableAttributes['proofingStatus'] = [
+                'label' => Craft::t('print-shop', 'Proofing Status')
+            ];
         });
         Event::on(Order::class, Element::EVENT_SET_TABLE_ATTRIBUTE_HTML, function(SetElementTableAttributeHtmlEvent $event) {
             if ($event->attribute === 'proofingStatus') {
+
                 /** @var Order $order */
                 $order = $event->sender;
 
-                $event->html = PrintShop::$plugin->proofs->getProofingStatusHtml($order);
+                $event->html = $this->proofs->getProofingStatusHtml($order);
 
                 // Prevent other event listeners from getting invoked
                 $event->handled = true;
             }
         });
-// XXX not working!
 
         // Load up the Variable
         Event::on(
