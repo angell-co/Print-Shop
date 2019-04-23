@@ -10,10 +10,9 @@
 
 namespace angellco\printshop\records;
 
-use angellco\printshop\PrintShop;
-
-use Craft;
 use craft\db\ActiveRecord;
+use craft\records\Asset;
+use yii\db\ActiveQueryInterface;
 
 /**
  * @author    Angell & Co
@@ -30,6 +29,26 @@ class Proof extends ActiveRecord
      */
     public static function tableName()
     {
-        return '{{%printshop_proof}}';
+        return '{{%printshop_proofs}}';
+    }
+
+    /**
+     * Returns the File that this Proof relates to.
+     *
+     * @return ActiveQueryInterface The relational query object.
+     */
+    public function getFile(): ActiveQueryInterface
+    {
+        return $this->hasOne(File::class, ['id' => 'fileId']);
+    }
+
+    /**
+     * Returns the associated asset with this Proof.
+     *
+     * @return ActiveQueryInterface The relational query object.
+     */
+    public function getAsset(): ActiveQueryInterface
+    {
+        return $this->hasOne(Asset::class, ['id' => 'assetId']);
     }
 }

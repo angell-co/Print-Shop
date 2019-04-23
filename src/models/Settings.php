@@ -16,6 +16,13 @@ use Craft;
 use craft\base\Model;
 
 /**
+ * @property string $volumeUid
+ * @property string $volumeSubpath
+ * @property string $proofsSentStatusUid
+ * @property string $proofsApprovedStatusUid
+ * @property string $proofsRejectedStatusUid
+ * @property string $proofEmailUid
+ *
  * @author    Angell & Co
  * @package   PrintShop
  * @since     2.0.0
@@ -28,22 +35,33 @@ class Settings extends Model
     /**
      * @var string
      */
-    public $filesVolumeUid;
+    public $volumeUid;
 
     /**
      * @var string
      */
-    public $filesVolumeSubpath;
+    public $volumeSubpath;
 
     /**
      * @var string
      */
-    public $proofsVolumeUid;
+    public $proofsSentStatusUid;
 
     /**
      * @var string
      */
-    public $proofsVolumeSubpath;
+    public $proofsApprovedStatusUid;
+
+    /**
+     * @var string
+     */
+    public $proofsRejectedStatusUid;
+
+    /**
+     * @var string
+     */
+    public $proofEmailUid;
+
 
     // Public Methods
     // =========================================================================
@@ -56,17 +74,22 @@ class Settings extends Model
         return [
             [
                 [
-                    'filesVolumeUid',
-                    'filesVolumeSubpath',
-                    'proofsVolumeUid',
-                    'proofsVolumeSubpath'
+                    'volumeUid',
+                    'volumeSubpath',
+                    'proofsSentStatusUid',
+                    'proofsApprovedStatusUid',
+                    'proofsRejectedStatusUid',
+                    'proofEmailUid',
                 ],
                 'string'
             ],
             [
                 [
-                    'filesVolumeUid',
-                    'proofsVolumeUid',
+                    'volumeUid',
+                    'proofsSentStatusUid',
+                    'proofsApprovedStatusUid',
+                    'proofsRejectedStatusUid',
+                    'proofEmailUid',
                 ],
                 'required'
             ],

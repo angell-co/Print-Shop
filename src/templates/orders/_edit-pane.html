@@ -1,0 +1,142 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{% import "_includes/forms" as forms %}
+
+</div>
+
+<div id="printShopTab" class="hidden">
+
+    <div id="printshop">
+        {% if order.lineItems | length or order.totalPrice > 0 %}
+        <div class="order-details pane">
+            <table id="printshop-maintable" class="data fullwidth collapsible">
+                <thead>
+                    <tr>
+                        <th scope="col" colspan="2">{{ 'Item'|t('commerce') }}</th>
+                        <th scope="col">{{ 'File'|t('print-shop') }}</th>
+                        <th scope="col">{{ 'Customer Note'|t('print-shop') }}</th>
+                        <th scope="col">{{ 'Proofs'|t('print-shop') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for lineItem in order.lineItems %}
+
+                    {% set info = [
+                        { label: "Description", value: lineItem.description },
+                        { label: "Tax Category", value: lineItem.taxCategory.name },
+                        { label: "Shipping Category", value: lineItem.shippingCategory.name },
+                        { label: "Price", value: lineItem.price|currency(order.currency) },
+                        { label: "Sale Amount", value: lineItem.saleAmount|currency(order.currency) },
+                        { label: "Sale Price", value: lineItem.salePrice|currency(order.currency) },
+                        { label: "Quantity", value: lineItem.qty },
+                        { label: "Sub-total", value: lineItem.subtotal|currency(order.currency) },
+                        { label: "Total (with adjustments)", value: lineItem.total|currency(order.currency) },
+                    ] %}
+
+                    <tr class="infoRow" data-id="{{ lineItem.id }}" data-info="{{ info|json_encode }}">
+                        <td data-title="{{ 'Item'|t('commerce') }}">
+                            {% if lineItem.purchasable %}
+                                {% if lineItem.purchasable.cpEditUrl %}
+                                    <a class="purchasable-link" href="{{ lineItem.purchasable.cpEditUrl }}">{{ lineItem.description }}</a>
+                                {% else %}
+                                    <span class="description">{{ lineItem.description }}</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="description">{{ lineItem.description }}</span>
+                            {% endif %}
+                            <br><span class="code">{{ lineItem.sku }}</span>
+                            {% if lineItem.options|length %}
+                                <a class="fieldtoggle first last" data-target="printshop-info-{{ lineItem.id }}">{{ "Options"|t('commerce') }}</a>
+                                <span id="printshop-info-{{ lineItem.id }}" class="hidden">
+                                {% for key, option in lineItem.options %}
+                                    {{ key|t('commerce') }}: {% if option is iterable %}
+                                    <code>{{ option|json_encode|raw }}</code>{% else %}{{ option }}{% endif %}
+                                    <br>
+                                {% endfor %}
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="tableRowInfo" data-icon="info" href="#"></span>
+                        </td>
+                        <td data-title="{{ 'File'|t('print-shop') }}">
+                            {% set file = craft.printShop.getFile(lineItem.id) %}
+                            {% if file %}
+                                <a href="{{ file.getDownloadUrl() }}" class="printshop__element-link">
+                                    {% include '_elements/element' with {
+                                        element: file.getAsset(),
+                                        size: 'large'
+                                    } %}
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td data-title="{{ 'Customer Note'|t('print-shop') }}">
+                            {% if lineItem.note %}
+                                <span class="info">{{ lineItem.note|nl2br }}</span>
+                            {% endif %}
+                        </td>
+                        <td data-title="{{ 'Proofs'|t('print-shop') }}">
+                            {% if file %}
+
+                                {% set folderSource = craft.printShop.getProofsFolderSourceForOrder(order.shortNumber) %}
+
+                                <proofs :proofs="{{ file.getProofs(true)|json_encode }}"
+                                        :line-item-id="{{ lineItem.id }}"
+                                        :source="'{{ folderSource }}'">
+
+                                    <div slot="AssetSelectInput">
+                                        {{ forms.elementSelectField({
+                                            label: "File"|t('app'),
+                                            id: 'newProof-'~lineItem.id~'-asset',
+                                            name: 'newProof['~lineItem.id~'][asset]',
+                                            required: true,
+                                            elementType: 'craft\\elements\\Asset',
+                                            selectionLabel: "Add a file"|t('app'),
+                                            sources: [folderSource],
+                                            criteria: { kind: ['image'] },
+                                            limit: 1,
+                                            elements: null,
+                                            jsClass: 'Craft.AssetSelectInput'
+                                        }) }}
+                                    </div>
+
+                                    <div slot="StaffNotesField">
+                                        {{ forms.textareaField({
+                                            label: "Notes"|t,
+                                            id: 'newProof-'~lineItem.id~'-notes',
+                                            name: 'newProof['~lineItem.id~'][notes]',
+                                            rows: 4
+                                        }) }}
+                                    </div>
+
+                                </proofs>
+
+
+
+                                {# elementType: assetElementType,
+                                   sources: proofAssetSources,
+                                   criteria: proofAssetCriteria,#}
+
+                            {% endif %}
+
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+
+    {% js %}
+        Garnish.$doc.ready(function() {
+            (new Craft.ElementThumbLoader()).load($('#printShopTab'));
+            Craft.cp.$collapsibleTables = Craft.cp.$collapsibleTables.add($('#printshop-maintable'));
+            Craft.cp.updateResponsiveTables();
+        });
+    {% endjs %}
+
+    {% css %}
+        #printshop-maintable.data > tbody tr td {
+            vertical-align: top;
+        }
+    {% endcss %}
