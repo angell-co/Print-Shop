@@ -1,6 +1,6 @@
 <template>
   <div>
-    <table class="data fullwidth">
+    <table class="data fullwidth" v-if="proofsList.length > 0">
       <thead>
         <tr>
           <th></th>
