@@ -66,6 +66,7 @@
 </template>
 
 <script>
+  /* global Craft */
 
   import axios from 'axios';
   import moment from 'moment';
@@ -148,13 +149,10 @@
             // Close the form
             this.showProofForm = false;
           }
-
-          return console.log(response.data);
         })
         .catch(response => {
           this.working = false;
           this.error = response;
-          return console.log(response);
         });
 
       }
