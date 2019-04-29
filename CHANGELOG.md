@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 
 
+## 2.0.2 - 2019-04-29
+### Changed
+- Changed license to the Craft license
+
+### Fixed
+- Fixed an issue with composer versions
+
 ## 2.0.1 - 2019-04-29
 ### Fixed
 - Fixed an issue with the proofing status table attribute appearing on other element indexes
