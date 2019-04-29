@@ -91,7 +91,7 @@ class PrintShop extends Plugin
         });
 
         // Register the proofing status attribute for the order index
-        Event::on(Element::class, Element::EVENT_REGISTER_TABLE_ATTRIBUTES, function(RegisterElementTableAttributesEvent $event) {
+        Event::on(Order::class, Element::EVENT_REGISTER_TABLE_ATTRIBUTES, function(RegisterElementTableAttributesEvent $event) {
             $event->tableAttributes['proofingStatus'] = [
                 'label' => Craft::t('print-shop', 'Proofing Status')
             ];
