@@ -173,8 +173,7 @@ class Proof extends Model
      */
     public function getAllProofs()
     {
-        // TODO - needs service
-//        return craft()->orderAssets_proofs->getOrderAssetProofsByOrderAssetFileId($this->orderAssetFileId);
+        return PrintShop::$plugin->proofs->getProofsByFileId($this->fileId);
     }
 
     /**
