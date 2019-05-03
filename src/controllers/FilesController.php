@@ -70,6 +70,8 @@ class FilesController extends Controller
         $settings = PrintShop::$plugin->getSettings();
         $volumeId = Db::idByUid('{{%volumes}}', $settings->volumeUid);
 
+        $volumeSubpath = $settings->volumeSubpath ? $settings->volumeSubpath.'/' : '';
+
 
         /**
          * Make a folder for the order using the order hash
@@ -81,7 +83,7 @@ class FilesController extends Controller
         $orderFolder = $assets->findFolder([
             'parentId' => $rootFolder->id,
             'name' => $cart->shortNumber,
-            'path' => $settings->volumeSubpath.'/'.$cart->shortNumber.'/'
+            'path' => $volumeSubpath.$cart->shortNumber.'/'
         ]);
 
         // If we didn’t get one, create it
@@ -91,7 +93,7 @@ class FilesController extends Controller
                 $folderModel->name = $cart->shortNumber;
                 $folderModel->parentId = $rootFolder->id;
                 $folderModel->volumeId = $rootFolder->volumeId;
-                $folderModel->path = $settings->volumeSubpath.'/'.$cart->shortNumber.'/';
+                $folderModel->path = $volumeSubpath.$cart->shortNumber.'/';
 
                 $assets->createFolder($folderModel);
 
