@@ -3,7 +3,6 @@
     <table class="data fullwidth" v-if="proofsList.length > 0">
       <thead>
         <tr>
-          <th></th>
           <th>File</th>
           <th>Status</th>
           <th>Date</th>
@@ -12,7 +11,6 @@
       </thead>
       <tbody>
         <tr v-for="proof in proofsList" :key="proof.uid">
-          <th>{{proof.id}}</th>
           <td>
             <a :href="proof.uid|assetDownload">{{proof.asset.filename}}</a>
           </td>
@@ -38,6 +36,8 @@
         </tr>
       </tbody>
     </table>
+
+    <div v-if="proofsList.length === 0 && !showProofForm" class="error">No proofs yet, <a role="button" @click="onShowProofForm()">add one</a>.</div>
 
     <div class="btn submit"
          role="button"
