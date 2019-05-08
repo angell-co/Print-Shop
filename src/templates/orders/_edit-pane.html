@@ -40,7 +40,7 @@
                         {% if lineItem.options|length %}
                             <h3>{{ "Options"|t('commerce') }}</h3>
                             {% for key, option in lineItem.options %}
-                                {{ key|t('commerce') }}: {% if option is iterable %}
+                                <span class="light"><strong>{{ key|t('commerce')|pascal }}:</strong></span> {% if option is iterable %}
                                 <code>{{ option|json_encode|raw }}</code>{% else %}{{ option }}{% endif %}
                                 <br>
                             {% endfor %}
