@@ -1,9 +1,9 @@
 /* global Craft */
 /* global Garnish */
-/* global $ */
 
-import Vue from 'vue'
-import Proofs from './components/Proofs.vue'
+import Vue from 'vue';
+import Proofs from './components/Proofs.vue';
+import LineItem from './components/LineItem.vue';
 
 import './main.scss';
 
@@ -15,6 +15,7 @@ Garnish.$doc.ready(function() {
     delimiters: ['${', '}'],
     components: {
       Proofs,
+      LineItem,
     }
   });
 

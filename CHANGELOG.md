@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.1.0 - 2019-05-08
+### Changed
+- Improved the Print Shop tab on the order edit page so its much more usable
+
 ## 2.0.5 - 2019-05-03
 ### Fixed
 - Fixed a missing method on the Proofs model
