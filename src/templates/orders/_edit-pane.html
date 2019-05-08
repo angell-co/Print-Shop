@@ -51,7 +51,7 @@
                         {% endif %}
                     </div>
 
-                    <div slot="CustomerFile">
+                    <div slot="CustomerFile" slot-scope="{ changeStatus }">
                     {% if file %}
 
                         <h3>{{ "Customer File"|t('print-shop') }}</h3>
@@ -65,7 +65,8 @@
                         {% set folderSource = craft.printShop.getProofsFolderSourceForOrder(order.shortNumber) %}
                         <proofs :proofs="{{ file.getProofs(true)|json_encode }}"
                                 :line-item-id="{{ lineItem.id }}"
-                                :source="'{{ folderSource }}'">
+                                :source="'{{ folderSource }}'"
+                                v-on:new-proof-added="changeStatus('new')">
 
                             <div slot="AssetSelectInput">
                                 {{ forms.elementSelectField({

@@ -148,6 +148,8 @@
             this.proofsList.push(response.data.proof);
             // Close the form
             this.showProofForm = false;
+
+            this.$emit('new-proof-added');
           }
         })
         .catch(response => {
