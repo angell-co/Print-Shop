@@ -39,7 +39,7 @@
         data() {
             return {
                 status: this.proofStatus,
-                showContent: this.status === 'no proof' || this.status === 'rejected',
+                showContent: true
             };
         },
         mounted() {
