@@ -109,6 +109,8 @@ class PrintShop extends Plugin
             }
         });
 
+        // TODO listen to the ReOrder event if its installed
+
         // Load up the Variable
         Event::on(
             CraftVariable::class,
