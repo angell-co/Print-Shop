@@ -10,6 +10,7 @@
 
 namespace angellco\printshop\services;
 
+use angellco\printshop\models\Proof;
 use angellco\printshop\PrintShop;
 use angellco\printshop\models\File;
 use angellco\printshop\records\File as FileRecord;
@@ -243,11 +244,49 @@ class Files extends Component
         ]);
 
         // Save it
-        return $this->saveFile($newFile);
+        $result = $this->saveFile($newFile);
 
 
-        // TODO Process the latest proof
+        // Process the latest proof
+        if ($result && $copyLatestProof) {
+            $proof = $file->getLatestProof();
+            if ($proof) {
 
+                // First copy over the asset to the new order folder
+                $proofAsset = $proof->getAsset();
+                if (!$proofAsset) {
+                    throw new Exception(Craft::t('print-shop', 'There was an error copying over the proofs.'));
+                }
+                $proofAssetCopyTempPath = $proofAsset->getCopyOfFile();
+
+                $newProofAsset = new Asset();
+                $newProofAsset->tempFilePath = $proofAssetCopyTempPath;
+                $newProofAsset->filename = $proofAsset->filename;
+                $newProofAsset->newFolderId = $folders['proofs']->id;
+                $newProofAsset->volumeId = $folders['proofs']->volumeId;
+                $newProofAsset->avoidFilenameConflicts = true;
+                $newProofAsset->setScenario(Asset::SCENARIO_CREATE);
+
+                if (!Craft::$app->getElements()->saveElement($newProofAsset)) {
+                    throw new Exception(Craft::t('print-shop', 'There was an error copying over the proofs.'));
+                }
+
+
+                // Make the new proof
+                $newProof = new Proof([
+                    'fileId' => $newFile->id,
+                    'assetId' => $newProofAsset->id,
+                    'status' => $proof->status,
+                    'staffNotes' => $proof->staffNotes,
+                    'customerNotes' => $proof->customerNotes
+                ]);
+
+                // Save it
+                $result = PrintShop::$plugin->proofs->saveProof($newProof);
+            }
+        }
+
+        return $result;
     }
 
 }

@@ -122,7 +122,7 @@ class PrintShop extends Plugin
                 function (Event $event) {
                     $file = $this->files->getFileByLineItemId($event->originalLineItem->id);
                     if ($file) {
-                        $this->files->copyFileToNewLineItem($file, $event->newLineItem);
+                        $this->files->copyFileToNewLineItem($file, $event->newLineItem, true);
                     }
                 }
             );

@@ -56,5 +56,6 @@ return [
     'Couldn’t upload file.' => 'Couldn’t upload file.',
     'Couldn’t get root folder.' => 'Couldn’t get root folder.',
     'Order not found.' => 'Order not found.',
-    'There was an error copying over the files.' => 'There was an error copying over the files.'
+    'There was an error copying over the files.' => 'There was an error copying over the files.',
+    'There was an error copying over the proofs.' => 'There was an error copying over the proofs.',
 ];

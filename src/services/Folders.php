@@ -69,8 +69,8 @@ class Folders extends Component
         $orderFolder = $assets->findFolder([
             'parentId' => $rootFolder->id,
             'name' => $order->shortNumber,
-            'path' => $volumeSubpath.$order->shortNumber.'/'
         ]);
+
 
         // If we didn’t get one, create it
         if ($orderFolder === null) {
@@ -98,7 +98,6 @@ class Folders extends Component
         $customerFilesFolder = $assets->findFolder([
             'parentId' => $orderFolder->id,
             'name' => Craft::t('print-shop','Customer Files'),
-            'path' => $orderFolder->path.Craft::t('print-shop','Customer-Files').'/',
         ]);
 
         // Check if we got one
@@ -128,7 +127,6 @@ class Folders extends Component
         $proofsFolder = $assets->findFolder([
             'parentId' => $orderFolder->id,
             'name' => Craft::t('print-shop','Proofs'),
-            'path' => $orderFolder->path.Craft::t('print-shop','Proofs').'/',
         ]);
 
         // Check if we got one
