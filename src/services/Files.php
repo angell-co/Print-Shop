@@ -10,12 +10,15 @@
 
 namespace angellco\printshop\services;
 
+use angellco\printshop\PrintShop;
 use angellco\printshop\models\File;
 use angellco\printshop\records\File as FileRecord;
 
 use Craft;
 use craft\base\Component;
+use craft\commerce\models\LineItem;
 use craft\elements\Asset;
+use yii\db\Exception;
 use yii\web\ServerErrorHttpException;
 
 /**
@@ -191,9 +194,60 @@ class Files extends Component
     }
 
 
-    public function copyFileToNewLineItem($file, $lineItem, $copyLatestProof = false)
+    /**
+     * @param File     $file
+     * @param LineItem $lineItem
+     * @param bool     $copyLatestProof
+     *
+     * @throws Exception
+     * @throws \Throwable
+     * @throws \craft\errors\ElementNotFoundException
+     * @throws \yii\base\Exception
+     */
+    public function copyFileToNewLineItem(File $file, LineItem $lineItem, $copyLatestProof = false)
     {
-        Craft::dd($file);
+        // Get the order and asset folders
+        $order = $lineItem->getOrder();
+
+        if (!$order) {
+            throw new Exception(Craft::t('print-shop', 'Order not found.'));
+        }
+
+        $folders = PrintShop::$plugin->folders->getFoldersForOrder($order->number);
+
+
+        // First copy over the asset to the new order folder
+        $asset = $file->getAsset();
+        if (!$asset) {
+            throw new Exception(Craft::t('print-shop', 'There was an error copying over the files.'));
+        }
+        $assetCopyTempPath = $asset->getCopyOfFile();
+
+        $newAsset = new Asset();
+        $newAsset->tempFilePath = $assetCopyTempPath;
+        $newAsset->filename = $asset->filename;
+        $newAsset->newFolderId = $folders['files']->id;
+        $newAsset->volumeId = $folders['files']->volumeId;
+        $newAsset->avoidFilenameConflicts = true;
+        $newAsset->setScenario(Asset::SCENARIO_CREATE);
+
+        if (!Craft::$app->getElements()->saveElement($newAsset)) {
+            throw new Exception(Craft::t('print-shop', 'There was an error copying over the files.'));
+        }
+
+
+        // Make a new File model with the new asset and line item ids
+        $newFile = new File([
+            'assetId' => $newAsset->id,
+            'lineItemId' => $lineItem->id
+        ]);
+
+        // Save it
+        return $this->saveFile($newFile);
+
+
+        // TODO Process the latest proof
+
     }
 
 }

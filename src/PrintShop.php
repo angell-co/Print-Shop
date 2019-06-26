@@ -120,16 +120,10 @@ class PrintShop extends Plugin
                 ReOrderService::class,
                 ReOrderService::EVENT_COPY_LINE_ITEM,
                 function (Event $event) {
-
                     $file = $this->files->getFileByLineItemId($event->originalLineItem->id);
-
                     if ($file) {
                         $this->files->copyFileToNewLineItem($file, $event->newLineItem);
                     }
-
-//                    $event->originalLineItem;
-//                    $event->newLineItem;
-
                 }
             );
         }
