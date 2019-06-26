@@ -189,5 +189,12 @@ class Files extends Component
         // Delete the File record
         return FileRecord::deleteAll(['id' => $file->id]);
     }
+
+
+    public function copyFileToNewLineItem($file, $lineItem, $copyLatestProof = false)
+    {
+        Craft::dd($file);
+    }
+
 }
 

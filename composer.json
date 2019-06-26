@@ -37,7 +37,8 @@
         "changelogUrl": "https://raw.githubusercontent.com/angell-co/print-shop/master/CHANGELOG.md",
         "components": {
             "files": "angellco\\printshop\\services\\Files",
-            "proofs": "angellco\\printshop\\services\\Proofs"
+            "proofs": "angellco\\printshop\\services\\Proofs",
+            "folders": "angellco\\printshop\\services\\Folders"
         },
         "class": "angellco\\printshop\\PrintShop"
     }

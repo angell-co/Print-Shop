@@ -62,7 +62,7 @@
                         </a>
 
                         <h3>{{ "Proofs"|t('print-shop') }}</h3>
-                        {% set folderSource = craft.printShop.getProofsFolderSourceForOrder(order.shortNumber) %}
+                        {% set folderSource = craft.printShop.getProofsFolderSourceForOrder(order.number) %}
                         <proofs :proofs="{{ file.getProofs(true)|json_encode }}"
                                 :line-item-id="{{ lineItem.id }}"
                                 :source="'{{ folderSource }}'"

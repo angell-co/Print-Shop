@@ -53,4 +53,6 @@ return [
     '{num} pending' => '{num} pending',
     '{num} approved' => '{num} approved',
     '{num} rejected' => '{num} rejected',
+    'Couldn’t upload file.' => 'Couldn’t upload file.',
+    'Couldn’t get root folder.' => 'Couldn’t get root folder.'
 ];
