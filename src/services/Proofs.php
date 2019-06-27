@@ -261,13 +261,15 @@ class Proofs extends Component
 
                     // Smush the proof onto the order history ... :/
                     $orderHistories = $order->getHistories();
-                    $orderHistory = $orderHistories[0];
-                    $orderHistory->message = [
-                        'proof' => $proof
-                    ];
+                    if ($orderHistories) {
+                        $orderHistory = $orderHistories[0];
+                        $orderHistory->message = [
+                            'proof' => $proof
+                        ];
 
-                    // Send the email
-                    PrintShop::$commerce->emails->sendEmail($email, $order, $orderHistory);
+                        // Send the email
+                        PrintShop::$commerce->emails->sendEmail($email, $order, $orderHistory);
+                    }
                 }
 
             }

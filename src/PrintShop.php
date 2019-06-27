@@ -12,8 +12,12 @@ namespace angellco\printshop;
 
 use angellco\printshop\services\Files;
 use angellco\printshop\services\Proofs;
+use angellco\printshop\services\Folders;
 use angellco\printshop\variables\PrintShopVariable;
 use angellco\printshop\models\Settings;
+
+use spicyweb\reorder\Plugin as ReOrderPlugin;
+use spicyweb\reorder\Service as ReOrderService;
 
 use Craft;
 use craft\base\Element;
@@ -40,6 +44,7 @@ use yii\base\Event;
  *
  * @property  Files $files
  * @property  Proofs $proofs
+ * @property  Folders $folders
  */
 class PrintShop extends Plugin
 {
@@ -108,6 +113,20 @@ class PrintShop extends Plugin
                 $event->handled = true;
             }
         });
+
+        // Listen to the ReOrder event if its installed
+        if (class_exists(ReOrderPlugin::class)) {
+            Event::on(
+                ReOrderService::class,
+                ReOrderService::EVENT_COPY_LINE_ITEM,
+                function (Event $event) {
+                    $file = $this->files->getFileByLineItemId($event->originalLineItem->id);
+                    if ($file) {
+                        $this->files->copyFileToNewLineItem($file, $event->newLineItem, true);
+                    }
+                }
+            );
+        }
 
         // Load up the Variable
         Event::on(

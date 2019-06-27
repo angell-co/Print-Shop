@@ -10,9 +10,9 @@
 
 namespace angellco\printshop\controllers;
 
+use angellco\printshop\PrintShop;
 use angellco\printshop\models\File;
 use angellco\printshop\models\Settings;
-use angellco\printshop\PrintShop;
 
 use Craft;
 use craft\elements\Asset;
@@ -21,9 +21,10 @@ use craft\helpers\App;
 use craft\helpers\Assets;
 use craft\helpers\Db;
 use craft\helpers\FileHelper;
-use craft\models\VolumeFolder;
 use craft\web\Controller;
 use craft\web\UploadedFile;
+use yii\base\ErrorException;
+use yii\base\Exception;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
@@ -62,126 +63,23 @@ class FilesController extends Controller
     {
         $this->requirePostRequest();
         $this->requireAcceptsJson();
-        $assets = Craft::$app->getAssets();
         $lineItemId = Craft::$app->getRequest()->getRequiredParam('lineItemId');
 
-        // Get the plugin settings so we have access to the volume info
-        /** @var Settings $settings */
-        $settings = PrintShop::$plugin->getSettings();
-        $volumeId = Db::idByUid('{{%volumes}}', $settings->volumeUid);
-
-        $volumeSubpath = $settings->volumeSubpath ? $settings->volumeSubpath.'/' : '';
-
-
-        /**
-         * Make a folder for the order using the order hash
-         */
-        $cart = PrintShop::$commerce->getCarts()->getCart();
-        $rootFolder = $assets->getRootFolderByVolumeId($volumeId);
-
-        // Try for an order folder - in case it already exists
-        $orderFolder = $assets->findFolder([
-            'parentId' => $rootFolder->id,
-            'name' => $cart->shortNumber,
-            'path' => $volumeSubpath.$cart->shortNumber.'/'
-        ]);
-
-        // If we didn’t get one, create it
-        if ($orderFolder === null) {
-            try {
-                $folderModel = new VolumeFolder();
-                $folderModel->name = $cart->shortNumber;
-                $folderModel->parentId = $rootFolder->id;
-                $folderModel->volumeId = $rootFolder->volumeId;
-                $folderModel->path = $volumeSubpath.$cart->shortNumber.'/';
-
-                $assets->createFolder($folderModel);
-
-                $orderFolder = $folderModel;
-            } catch (AssetException $exception) {
-                return $this->asErrorJson($exception->getMessage());
-            }
+        // Get the folders
+        try {
+            $folders = PrintShop::$plugin->folders->getFoldersForOrder();
+        } catch (\Exception $e) {
+            return $this->asErrorJson($e->getMessage());
         }
-
-        // Final order folder check
-        if (!$orderFolder) {
-            return $this->asErrorJson(Craft::t('print-shop', 'Unable to upload files at this time.'));
-        }
-
-
-        /**
-         * Make a folder for the customer files inside the order folder
-         */
-        // Try for the customer files folder - in case it already exists
-        $customerFilesFolder = $assets->findFolder([
-            'parentId' => $orderFolder->id,
-            'name' => Craft::t('print-shop','Customer Files'),
-            'path' => $orderFolder->path.Craft::t('print-shop','Customer-Files').'/',
-        ]);
-
-        // Check if we got one
-        if (!$customerFilesFolder) {
-            // We didn’t, so create it
-            try {
-                $folderModel = new VolumeFolder();
-                $folderModel->name = Craft::t('print-shop','Customer Files');
-                $folderModel->parentId = $orderFolder->id;
-                $folderModel->volumeId = $orderFolder->volumeId;
-                $folderModel->path = $orderFolder->path.Craft::t('print-shop','Customer-Files').'/';
-
-                $assets->createFolder($folderModel);
-
-                $customerFilesFolder = $folderModel;
-            } catch (AssetException $exception) {
-                return $this->asErrorJson($exception->getMessage());
-            }
-        }
-
-        // Final customer files folder check
-        if (!$customerFilesFolder) {
-            return $this->asErrorJson(Craft::t('print-shop', 'Unable to upload files at this time.'));
-        }
-
-
-        /**
-         * Also make a folder for the proofs whilst we’re here
-         */
-        // Try for the proofs files folder - in case it already exists
-        $proofsFolder = $assets->findFolder([
-            'parentId' => $orderFolder->id,
-            'name' => Craft::t('print-shop','Proofs'),
-            'path' => $orderFolder->path.Craft::t('print-shop','Proofs').'/',
-        ]);
-
-        // Check if we got one
-        if (!$proofsFolder) {
-            // We didn’t, so create it
-            try {
-                $folderModel = new VolumeFolder();
-                $folderModel->name = Craft::t('print-shop','Proofs');
-                $folderModel->parentId = $orderFolder->id;
-                $folderModel->volumeId = $orderFolder->volumeId;
-                $folderModel->path = $orderFolder->path.Craft::t('print-shop','Proofs').'/';
-
-                $assets->createFolder($folderModel);
-
-                $proofsFolder = $folderModel;
-            } catch (AssetException $exception) {
-                return $this->asErrorJson($exception->getMessage());
-            }
-        }
-
-        // Final proofs folder check
-        if (!$proofsFolder) {
-            return $this->asErrorJson(Craft::t('print-shop', 'Unable to upload files at this time.'));
-        }
-
 
         /**
          * Upload the file to Assets and store it in the folder we got from above.
          * Straight from `AssetsController::actionExpressUpload()`
          */
         $uploadedFile = UploadedFile::getInstanceByName('file_'.$lineItemId);
+        if (!$uploadedFile) {
+            throw new Exception(Craft::t('print-shop', 'Couldn’t upload file.'));
+        }
         $fileName = $uploadedFile->name;
 
         if ($uploadedFile->getExtension() === 'tif') {
@@ -196,8 +94,8 @@ class FilesController extends Controller
             $asset = new Asset();
             $asset->tempFilePath = $tempPath;
             $asset->filename = $fileName;
-            $asset->newFolderId = $customerFilesFolder->id;
-            $asset->volumeId = $customerFilesFolder->volumeId;
+            $asset->newFolderId = $folders['files']->id;
+            $asset->volumeId = $folders['files']->volumeId;
             $asset->avoidFilenameConflicts = true;
             $asset->setScenario(Asset::SCENARIO_CREATE);
 

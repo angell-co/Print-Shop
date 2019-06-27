@@ -52,30 +52,24 @@ class PrintShopVariable
     }
 
     /**
-     * Returns the Proofs folder for a given order short number.
+     * Returns the Proofs folder for a given order number.
      *
-     * @param $shortNumber
+     * @param $orderNumber
      *
-     * @return VolumeFolder
+     * @return string
      * @throws VolumeException
+     * @throws \Throwable
+     * @throws \craft\errors\AssetConflictException
+     * @throws \craft\errors\ElementNotFoundException
+     * @throws \craft\errors\VolumeObjectExistsException
+     * @throws \yii\base\Exception
      */
-    public function getProofsFolderSourceForOrder($shortNumber)
+    public function getProofsFolderSourceForOrder($orderNumber)
     {
-        // Get folder from settings etc
-        $settings = PrintShop::$plugin->getSettings();
-        $volumeId = Db::idByUid('{{%volumes}}', $settings->volumeUid);
-
-        $volumeSubpath = $settings->volumeSubpath ? $settings->volumeSubpath.'/' : '';
-
-        $folder = Craft::$app->getAssets()->findFolder([
-            'volumeId' => $volumeId,
-            'path' => $volumeSubpath.$shortNumber.'/'.Craft::t('print-shop','Proofs').'/'
-        ]);
-
-        if (!$folder) {
-            throw new VolumeException(Craft::t('print-shop', 'Proofs folder not found'));
-        }
-
+        // Get the proofs folder
+        $folders = PrintShop::$plugin->folders->getFoldersForOrder($orderNumber);
+        /** @var VolumeFolder $folder */
+        $folder = $folders['proofs'];
         $folderPath = 'folder:' . $folder->uid;
 
         // Construct the path

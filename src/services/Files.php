@@ -10,12 +10,16 @@
 
 namespace angellco\printshop\services;
 
+use angellco\printshop\models\Proof;
+use angellco\printshop\PrintShop;
 use angellco\printshop\models\File;
 use angellco\printshop\records\File as FileRecord;
 
 use Craft;
 use craft\base\Component;
+use craft\commerce\models\LineItem;
 use craft\elements\Asset;
+use yii\db\Exception;
 use yii\web\ServerErrorHttpException;
 
 /**
@@ -189,5 +193,101 @@ class Files extends Component
         // Delete the File record
         return FileRecord::deleteAll(['id' => $file->id]);
     }
+
+
+    /**
+     * @param File     $file
+     * @param LineItem $lineItem
+     * @param bool     $copyLatestProof
+     *
+     * @throws Exception
+     * @throws \Throwable
+     * @throws \craft\errors\ElementNotFoundException
+     * @throws \yii\base\Exception
+     */
+    public function copyFileToNewLineItem(File $file, LineItem $lineItem, $copyLatestProof = false)
+    {
+        // Get the order and asset folders
+        $order = $lineItem->getOrder();
+
+        if (!$order) {
+            throw new Exception(Craft::t('print-shop', 'Order not found.'));
+        }
+
+        $folders = PrintShop::$plugin->folders->getFoldersForOrder($order->number);
+
+
+        // First copy over the asset to the new order folder
+        $asset = $file->getAsset();
+        if (!$asset) {
+            throw new Exception(Craft::t('print-shop', 'There was an error copying over the files.'));
+        }
+        $assetCopyTempPath = $asset->getCopyOfFile();
+
+        $newAsset = new Asset();
+        $newAsset->tempFilePath = $assetCopyTempPath;
+        $newAsset->filename = $asset->filename;
+        $newAsset->newFolderId = $folders['files']->id;
+        $newAsset->volumeId = $folders['files']->volumeId;
+        $newAsset->avoidFilenameConflicts = true;
+        $newAsset->setScenario(Asset::SCENARIO_CREATE);
+
+        if (!Craft::$app->getElements()->saveElement($newAsset)) {
+            throw new Exception(Craft::t('print-shop', 'There was an error copying over the files.'));
+        }
+
+
+        // Make a new File model with the new asset and line item ids
+        $newFile = new File([
+            'assetId' => $newAsset->id,
+            'lineItemId' => $lineItem->id
+        ]);
+
+        // Save it
+        $result = $this->saveFile($newFile);
+
+
+        // Process the latest proof
+        if ($result && $copyLatestProof) {
+            $proof = $file->getLatestProof();
+            if ($proof) {
+
+                // First copy over the asset to the new order folder
+                $proofAsset = $proof->getAsset();
+                if (!$proofAsset) {
+                    throw new Exception(Craft::t('print-shop', 'There was an error copying over the proofs.'));
+                }
+                $proofAssetCopyTempPath = $proofAsset->getCopyOfFile();
+
+                $newProofAsset = new Asset();
+                $newProofAsset->tempFilePath = $proofAssetCopyTempPath;
+                $newProofAsset->filename = $proofAsset->filename;
+                $newProofAsset->newFolderId = $folders['proofs']->id;
+                $newProofAsset->volumeId = $folders['proofs']->volumeId;
+                $newProofAsset->avoidFilenameConflicts = true;
+                $newProofAsset->setScenario(Asset::SCENARIO_CREATE);
+
+                if (!Craft::$app->getElements()->saveElement($newProofAsset)) {
+                    throw new Exception(Craft::t('print-shop', 'There was an error copying over the proofs.'));
+                }
+
+
+                // Make the new proof
+                $newProof = new Proof([
+                    'fileId' => $newFile->id,
+                    'assetId' => $newProofAsset->id,
+                    'status' => $proof->status,
+                    'staffNotes' => $proof->staffNotes,
+                    'customerNotes' => $proof->customerNotes
+                ]);
+
+                // Save it
+                $result = PrintShop::$plugin->proofs->saveProof($newProof);
+            }
+        }
+
+        return $result;
+    }
+
 }
 
