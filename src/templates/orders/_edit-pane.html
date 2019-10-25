@@ -94,6 +94,22 @@
                             </div>
 
                         </proofs>
+                    {% else %}
+                        TODO: No file, do upload - need component to do the save and init the ui
+                        {% set folderSource = craft.printShop.getFilesFolderSourceForOrder(order.number) %}
+                        {{ forms.elementSelectField({
+                            label: "Customer File"|t('print-shop'),
+                            id: 'newFile-'~lineItem.id~'-asset',
+                            name: 'newFile['~lineItem.id~'][asset]',
+                            required: true,
+                            elementType: 'craft\\elements\\Asset',
+                            selectionLabel: "Add a file"|t('app'),
+                            sources: [folderSource],
+                            criteria: { kind: ['image'] },
+                            limit: 1,
+                            elements: null,
+                            jsClass: 'Craft.AssetSelectInput'
+                        }) }}
                     {% endif %}
                     </div>
 

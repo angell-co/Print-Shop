@@ -82,4 +82,35 @@ class PrintShopVariable
         return $folderPath;
     }
 
+    /**
+     * Returns the Files folder for a given order number.
+     *
+     * @param $orderNumber
+     *
+     * @return string
+     * @throws VolumeException
+     * @throws \Throwable
+     * @throws \craft\errors\AssetConflictException
+     * @throws \craft\errors\ElementNotFoundException
+     * @throws \craft\errors\VolumeObjectExistsException
+     * @throws \yii\base\Exception
+     */
+    public function getFilesFolderSourceForOrder($orderNumber)
+    {
+        // Get the proofs folder
+        $folders = PrintShop::$plugin->folders->getFoldersForOrder($orderNumber);
+        /** @var VolumeFolder $folder */
+        $folder = $folders['files'];
+        $folderPath = 'folder:' . $folder->uid;
+
+        // Construct the path
+        while ($folder->parentId && $folder->volumeId !== null) {
+            $parent = $folder->getParent();
+            $folderPath = 'folder:' . $parent->uid . '/' . $folderPath;
+            $folder = $parent;
+        }
+
+        return $folderPath;
+    }
+
 }
