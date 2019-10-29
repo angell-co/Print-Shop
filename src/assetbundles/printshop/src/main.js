@@ -4,6 +4,7 @@
 import Vue from 'vue';
 import Proofs from './components/Proofs.vue';
 import LineItem from './components/LineItem.vue';
+import CustomerFile from './components/CustomerFile.vue';
 
 import './main.scss';
 
@@ -16,6 +17,7 @@ Garnish.$doc.ready(function() {
     components: {
       Proofs,
       LineItem,
+      CustomerFile,
     }
   });
 

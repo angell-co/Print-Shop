@@ -66,7 +66,7 @@ class ProofsController extends Controller
         $lineItemFile = PrintShop::$plugin->files->getFileByLineItemId($lineItemId);
 
         if (!$lineItemFile) {
-            return $this->asErrorJson(Craft::t('print-shop', 'Couldn’t get custom file.'));
+            return $this->asErrorJson(Craft::t('print-shop', 'Couldn’t get customer file.'));
         }
 
         // Save the proof

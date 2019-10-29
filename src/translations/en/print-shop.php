@@ -32,7 +32,7 @@ return [
     'Proofs folder not found' => 'Proofs folder not found',
     'Missing required line item.' => 'Missing required line item.',
     'You must add a file.' => 'You must add a file.',
-    'Couldn’t get custom file.' => 'Couldn’t get custom file.',
+    'Couldn’t get customer file.' => 'Couldn’t get customer file.',
     'Couldn’t save proof.' => 'Couldn’t save proof.',
     'The Proof you’re trying to access does not exist.' => 'The Proof you’re trying to access does not exist.',
     'Proofs Sent' => 'Proofs Sent',

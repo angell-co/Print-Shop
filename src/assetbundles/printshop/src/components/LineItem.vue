@@ -23,7 +23,9 @@
         <template v-if="showContent">
             <slot name="Meta"></slot>
             <hr>
-            <slot name="CustomerFile" :changeStatus="changeStatus"></slot>
+            <slot name="CustomerFile"
+                  :changeStatus="changeStatus"
+                  :onNewCustomerFileAdded="onNewCustomerFileAdded"></slot>
         </template>
     </div>
 
@@ -63,6 +65,13 @@
             },
             changeStatus (status) {
                 this.status = status;
+            },
+            onNewCustomerFileAdded () {
+                this.$children.forEach(el => {
+                    if (typeof el.hasCustomerFile !== "undefined") {
+                        el.$vnode.componentInstance.showAll = true;
+                    }
+                });
             }
         }
     }
