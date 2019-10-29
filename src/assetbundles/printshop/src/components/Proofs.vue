@@ -1,67 +1,69 @@
 <template>
-  <div>
-    <table class="data fullwidth" v-if="proofsList.length > 0">
-      <thead>
-        <tr>
-          <th>File</th>
-          <th>Status</th>
-          <th>Date</th>
-          <th>Notes</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="proof in proofsList" :key="proof.uid">
-          <td>
-            <a :href="proof.uid|assetDownload">{{proof.asset.filename}}</a>
-          </td>
-          <td width="90px">
-            <span class="status" :class="{
-              white: proof.status == 'new',
-              green: proof.status == 'approved',
-              red: proof.status == 'rejected'
-            }"></span>
-            {{proof.status|capitalize}}
-          </td>
-          <td width="220px">{{proof.date|date}}</td>
-          <td>
-            <div v-if="proof.staffNotes">
-              <strong>Staff Notes:</strong><br>
-              <nl2br tag="p" :text="proof.staffNotes" />
-            </div>
-            <div v-if="proof.customerNotes">
-              <strong>Customer Notes:</strong><br>
-              <nl2br tag="p" :text="proof.customerNotes" />
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div v-if="showAll" class="proofs">
+    <h3>Proofs</h3>
 
-    <div v-if="proofsList.length === 0 && !showProofForm" class="error">No proofs yet, <a role="button" @click="onShowProofForm()">add one</a>.</div>
-
-    <div class="btn submit"
-         role="button"
-         v-if="!showProofForm"
-         @click="onShowProofForm()">Add proof</div>
-
-    <div class="pane" v-if="showProofForm">
-      <table class="proofform data fullwidth">
-        <tbody>
+      <table class="data fullwidth" v-if="proofsList.length > 0">
+        <thead>
           <tr>
-            <td width="200px">
-              <slot name="AssetSelectInput"></slot>
-            </td>
+            <th>File</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="proof in proofsList" :key="proof.uid">
             <td>
-              <slot name="StaffNotesField"></slot>
+              <a :href="proof.uid|assetDownload">{{proof.asset.filename}}</a>
+            </td>
+            <td width="90px">
+              <span class="status" :class="{
+                white: proof.status == 'new',
+                green: proof.status == 'approved',
+                red: proof.status == 'rejected'
+              }"></span>
+              {{proof.status|capitalize}}
+            </td>
+            <td width="220px">{{proof.date|date}}</td>
+            <td>
+              <div v-if="proof.staffNotes">
+                <strong>Staff Notes:</strong><br>
+                <nl2br tag="p" :text="proof.staffNotes" />
+              </div>
+              <div v-if="proof.customerNotes">
+                <strong>Customer Notes:</strong><br>
+                <nl2br tag="p" :text="proof.customerNotes" />
+              </div>
             </td>
           </tr>
         </tbody>
       </table>
 
-      <div class="btn submit" role="button" @click="submit()">Save</div>
-      <div v-if="working" class="spinner"></div>
-      <div v-if="error" class="error">{{error}}</div>
-    </div>
+      <div v-if="proofsList.length === 0 && !showProofForm" class="error">No proofs yet, <a role="button" @click="onShowProofForm()">add one</a>.</div>
+
+      <div class="btn submit"
+           role="button"
+           v-if="!showProofForm"
+           @click="onShowProofForm()">Add proof</div>
+
+      <div class="pane" v-if="showProofForm">
+        <table class="proofform data fullwidth">
+          <tbody>
+            <tr>
+              <td width="200px">
+                <slot name="AssetSelectInput"></slot>
+              </td>
+              <td>
+                <slot name="StaffNotesField"></slot>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="btn submit" role="button" @click="submit()">Save</div>
+        <div v-if="working" class="spinner"></div>
+        <div v-if="error" class="error">{{error}}</div>
+      </div>
   </div>
 </template>
 
@@ -74,7 +76,7 @@
 
   export default {
     name: 'proofs',
-    props: ['proofs','lineItemId','source'],
+    props: ['proofs','hasCustomerFile','lineItemId','source'],
     components: {
       nl2br,
     },
@@ -83,6 +85,7 @@
         assetSelectInput: null,
         working: false,
         error: null,
+        showAll: this.hasCustomerFile,
         showProofForm: false,
         proofsList: this.proofs
       };
@@ -163,6 +166,11 @@
 </script>
 
 <style scoped type="text/scss">
+
+  .proofs {
+    margin-top: 24px;
+  }
+
   table.data tbody tr td,
   table.data tbody tr th {
     border-top: 0;

@@ -21,6 +21,7 @@ use craft\helpers\App;
 use craft\helpers\Assets;
 use craft\helpers\Db;
 use craft\helpers\FileHelper;
+use craft\helpers\Json;
 use craft\web\Controller;
 use craft\web\UploadedFile;
 use yii\base\ErrorException;
@@ -126,6 +127,45 @@ class FilesController extends Controller
         }
 
         return $this->asJson(['success' => true, 'file' => $file]);
+    }
+
+    public function actionSave(): Response
+    {
+        $this->requirePostRequest();
+        $this->requireAcceptsJson();
+
+        $payload = Json::decode(Craft::$app->getRequest()->getRawBody(), true);
+        $lineItemId = (isset($payload['lineItemId']) ? $payload['lineItemId'] : null);
+        $assetIds = (isset($payload['assetIds']) ? $payload['assetIds'] : null);
+
+        if (!$lineItemId) {
+            return $this->asErrorJson(Craft::t('print-shop', 'Missing required line item.'));
+        }
+
+        if (!$assetIds) {
+            return $this->asErrorJson(Craft::t('print-shop', 'You must add a file.'));
+        }
+
+        // If this exact same File already exists (we won’t have a file ID) then
+        // get that
+        $currentFile = PrintShop::$plugin->files->getFileByLineItemId($lineItemId);
+        if ($currentFile && $currentFile->assetId === $assetIds[0]) {
+            $file = $currentFile;
+        } else {
+            $file = new File();
+            $file->assetId = $assetIds[0];
+            $file->lineItemId = $lineItemId;
+        }
+
+        // Save it
+        if (!PrintShop::$plugin->files->saveFile($file)) {
+            return $this->asErrorJson(Craft::t('print-shop', 'Couldn’t save customer file.'));
+        }
+
+        return $this->asJson([
+            'success' => true,
+            'file' => PrintShop::$plugin->files->getFileById($file->id, true)
+        ]);
     }
 
     /**

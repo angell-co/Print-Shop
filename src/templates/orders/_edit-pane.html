@@ -51,21 +51,37 @@
                         {% endif %}
                     </div>
 
-                    <div slot="CustomerFile" slot-scope="{ changeStatus }">
-                    {% if file %}
+                    <div slot="CustomerFile" slot-scope="{ changeStatus, onNewCustomerFileAdded }">
 
-                        <h3>{{ "Customer File"|t('print-shop') }}</h3>
-                        <a href="{{ file.getDownloadUrl() }}" class="printshop__element-link">
-                            {% include '_elements/element' with {
-                                element: file.getAsset()
-                            } %}
-                        </a>
+                        {% set filesFolderSource = craft.printShop.getFilesFolderSourceForOrder(order.number) %}
+                        <customer-file :file="{{ file ? file|json_encode : 'null' }}"
+                                       :line-item-id="{{ lineItem.id }}"
+                                       :source="'{{ filesFolderSource }}'"
+                                       v-on:new-file-added="onNewCustomerFileAdded()">
 
-                        <h3>{{ "Proofs"|t('print-shop') }}</h3>
-                        {% set folderSource = craft.printShop.getProofsFolderSourceForOrder(order.number) %}
-                        <proofs :proofs="{{ file.getProofs(true)|json_encode }}"
+                            <div slot="AssetSelectInput">
+                                {{ forms.elementSelectField({
+                                    label: "Artwork"|t('print-shop'),
+                                    id: 'newFile-'~lineItem.id~'-asset',
+                                    name: 'newFile['~lineItem.id~'][asset]',
+                                    required: true,
+                                    elementType: 'craft\\elements\\Asset',
+                                    selectionLabel: "Add a file"|t('app'),
+                                    sources: [filesFolderSource],
+                                    criteria: { kind: ['image'] },
+                                    limit: 1,
+                                    elements: file ? [file.getAsset()] : null,
+                                    jsClass: 'Craft.AssetSelectInput'
+                                }) }}
+                            </div>
+
+                        </customer-file>
+
+                        {% set proofsFolderSource = craft.printShop.getProofsFolderSourceForOrder(order.number) %}
+                        <proofs :proofs="{{ file ? file.getProofs(true)|json_encode : []|json_encode }}"
+                                :has-customer-file="{{ file ? 'true' : 'false' }}"
                                 :line-item-id="{{ lineItem.id }}"
-                                :source="'{{ folderSource }}'"
+                                :source="'{{ proofsFolderSource }}'"
                                 v-on:new-proof-added="changeStatus('new')">
 
                             <div slot="AssetSelectInput">
@@ -76,7 +92,7 @@
                                     required: true,
                                     elementType: 'craft\\elements\\Asset',
                                     selectionLabel: "Add a file"|t('app'),
-                                    sources: [folderSource],
+                                    sources: [proofsFolderSource],
                                     criteria: { kind: ['image'] },
                                     limit: 1,
                                     elements: null,
@@ -94,23 +110,6 @@
                             </div>
 
                         </proofs>
-                    {% else %}
-                        TODO: No file, do upload - need component to do the save and init the ui
-                        {% set folderSource = craft.printShop.getFilesFolderSourceForOrder(order.number) %}
-                        {{ forms.elementSelectField({
-                            label: "Customer File"|t('print-shop'),
-                            id: 'newFile-'~lineItem.id~'-asset',
-                            name: 'newFile['~lineItem.id~'][asset]',
-                            required: true,
-                            elementType: 'craft\\elements\\Asset',
-                            selectionLabel: "Add a file"|t('app'),
-                            sources: [folderSource],
-                            criteria: { kind: ['image'] },
-                            limit: 1,
-                            elements: null,
-                            jsClass: 'Craft.AssetSelectInput'
-                        }) }}
-                    {% endif %}
                     </div>
 
                 </line-item>
@@ -132,3 +131,8 @@
             vertical-align: top;
         }
     {% endcss %}
+
+    {# DEBUG #}
+    {% do view.registerJsFile("https://192.168.88.251:8080/app.js", {
+        depends: 'craft\\web\\assets\\vue\\VueAsset'
+    }) %}
