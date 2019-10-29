@@ -5,7 +5,7 @@
         <slot name="AssetSelectInput"></slot>
 
         <div class="btngroup">
-            <a class="btn small" href="#">Download</a>
+            <a v-if="customerFileUid" class="btn small" :href="customerFileUid|assetDownload">Download</a>
             <div class="btn submit small" role="button" @click="submit()">Save</div>
         </div>
         <div v-if="working" class="spinner"></div>
@@ -23,6 +23,7 @@
         props: ['file','lineItemId','source'],
         data() {
             return {
+                customerFileUid: this.file ? this.file.uid : null,
                 assetSelectInput: null,
                 working: false,
                 error: null,
@@ -31,6 +32,13 @@
         mounted() {
             Craft.initUiElements();
             this.initAssetSelectInput();
+        },
+        filters: {
+            assetDownload: function(uid) {
+                return Craft.getActionUrl('print-shop/files/download', {
+                    uid: uid
+                });
+            }
         },
         methods: {
 
@@ -70,6 +78,7 @@
                         if (response.data.error) {
                             this.error = response.data.error;
                         } else {
+                            this.customerFileUid = response.data.file.uid;
                             this.$emit('new-file-added');
                         }
                     })
