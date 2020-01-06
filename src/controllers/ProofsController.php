@@ -39,7 +39,7 @@ class ProofsController extends Controller
      *         The actions must be in 'kebab-case'
      * @access protected
      */
-    protected $allowAnonymous = ['approve', 'reject'];
+    protected $allowAnonymous = ['approve', 'reject','download'];
 
     // Public Methods
     // =========================================================================
