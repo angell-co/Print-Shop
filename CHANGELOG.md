@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.3.2 - 2020-01-06
+### Fixed
+- Whitelisted the proof and file download actions so they don’t require a login to work
+
+## 2.3.1 - 2019-10-29
+### Fixed
+- Dropped the requirement for the Commerce 3 Alpha
+
 ## 2.3.0 - 2019-06-27
 ### Added
 - Added option to add a customer file in the control panel
