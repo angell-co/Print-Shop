@@ -13,15 +13,21 @@
                 {% set file = craft.printShop.getFile(lineItem.id) %}
                 {% set proofStatus = 'no customer file' %}
                 {% if file %}
-                    {% set proof = file.getLatestProof() %}
-                    {% if proof %}
-                        {% set proofStatus = proof.status %}
+                    {% if printShopSettings.enableProofs %}
+                        {% set proof = file.getLatestProof() %}
+                        {% if proof %}
+                            {% set proofStatus = proof.status %}
+                        {% else %}
+                            {% set proofStatus = 'no proof' %}
+                        {% endif %}
                     {% else %}
-                        {% set proofStatus = 'no proof' %}
+                        {% set proofStatus = 'artwork supplied' %}
                     {% endif %}
                 {% endif %}
+
                 <line-item :line-item="{{ lineItem|json_encode }}"
-                           :proof-status="'{{ proofStatus }}'">
+                           :proof-status="'{{ proofStatus }}'"
+                           :enable-proofs="{{ printShopSettings.enableProofs ? 'true' : 'false' }}">
 
                     <div slot="Title" class="titlebar">
                         {% if lineItem.purchasable %}
@@ -77,39 +83,41 @@
 
                         </customer-file>
 
-                        {% set proofsFolderSource = craft.printShop.getProofsFolderSourceForOrder(order.number) %}
-                        <proofs :proofs="{{ file ? file.getProofs(true)|json_encode : []|json_encode }}"
-                                :has-customer-file="{{ file ? 'true' : 'false' }}"
-                                :line-item-id="{{ lineItem.id }}"
-                                :source="'{{ proofsFolderSource }}'"
-                                v-on:new-proof-added="changeStatus('new')">
+                        {% if printShopSettings.enableProofs %}
+                            {% set proofsFolderSource = craft.printShop.getProofsFolderSourceForOrder(order.number) %}
+                            <proofs :proofs="{{ file ? file.getProofs(true)|json_encode : []|json_encode }}"
+                                    :has-customer-file="{{ file ? 'true' : 'false' }}"
+                                    :line-item-id="{{ lineItem.id }}"
+                                    :source="'{{ proofsFolderSource }}'"
+                                    v-on:new-proof-added="changeStatus('new')">
 
-                            <div slot="AssetSelectInput">
-                                {{ forms.elementSelectField({
-                                    label: "File"|t('app'),
-                                    id: 'newProof-'~lineItem.id~'-asset',
-                                    name: 'newProof['~lineItem.id~'][asset]',
-                                    required: true,
-                                    elementType: 'craft\\elements\\Asset',
-                                    selectionLabel: "Add a file"|t('app'),
-                                    sources: [proofsFolderSource],
-                                    criteria: { kind: ['image'] },
-                                    limit: 1,
-                                    elements: null,
-                                    jsClass: 'Craft.AssetSelectInput'
-                                }) }}
-                            </div>
+                                <div slot="AssetSelectInput">
+                                    {{ forms.elementSelectField({
+                                        label: "File"|t('app'),
+                                        id: 'newProof-'~lineItem.id~'-asset',
+                                        name: 'newProof['~lineItem.id~'][asset]',
+                                        required: true,
+                                        elementType: 'craft\\elements\\Asset',
+                                        selectionLabel: "Add a file"|t('app'),
+                                        sources: [proofsFolderSource],
+                                        criteria: { kind: ['image'] },
+                                        limit: 1,
+                                        elements: null,
+                                        jsClass: 'Craft.AssetSelectInput'
+                                    }) }}
+                                </div>
 
-                            <div slot="StaffNotesField">
-                                {{ forms.textareaField({
-                                    label: "Notes"|t,
-                                    id: 'newProof-'~lineItem.id~'-notes',
-                                    name: 'newProof['~lineItem.id~'][notes]',
-                                    rows: 4
-                                }) }}
-                            </div>
+                                <div slot="StaffNotesField">
+                                    {{ forms.textareaField({
+                                        label: "Notes"|t,
+                                        id: 'newProof-'~lineItem.id~'-notes',
+                                        name: 'newProof['~lineItem.id~'][notes]',
+                                        rows: 4
+                                    }) }}
+                                </div>
 
-                        </proofs>
+                            </proofs>
+                        {% endif %}
                     </div>
 
                 </line-item>

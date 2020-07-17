@@ -92,6 +92,7 @@ class PrintShop extends Plugin
         });
         Craft::$app->view->hook('cp.commerce.order.edit.main-pane', function(array &$context) {
             Craft::$app->view->registerAssetBundle("angellco\\printshop\\assetbundles\\printshop\\PrintShopAsset");
+            $context['printShopSettings'] = $this->getSettings();
             return Craft::$app->view->renderTemplate('print-shop/orders/_edit-pane', $context);
         });
 
