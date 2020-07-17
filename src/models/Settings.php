@@ -38,6 +38,11 @@ class Settings extends Model
     public $volumeUid;
 
     /**
+     * @var bool
+     */
+    public $enableProofs = true;
+
+    /**
      * @var string
      */
     public $volumeSubpath;
@@ -71,7 +76,10 @@ class Settings extends Model
      */
     public function rules()
     {
+
         return [
+            ['volumeUid', 'required'],
+            ['enableProofs', 'boolean'],
             [
                 [
                     'volumeUid',
@@ -82,16 +90,6 @@ class Settings extends Model
                     'proofEmailUid',
                 ],
                 'string'
-            ],
-            [
-                [
-                    'volumeUid',
-                    'proofsSentStatusUid',
-                    'proofsApprovedStatusUid',
-                    'proofsRejectedStatusUid',
-                    'proofEmailUid',
-                ],
-                'required'
             ],
         ];
     }

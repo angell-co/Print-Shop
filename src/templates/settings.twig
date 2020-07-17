@@ -58,74 +58,82 @@
     }, '<p class="error">' ~ "No volumes exist yet."|t('app') ~ '</p>') }}
 {% endif %}
 
-{% set emailsList = [] %}
-{% for email in commerceEmails %}
-    {% set emailsList = emailsList|merge([{'value': email.uid, 'label': email.name}]) %}
-{% endfor %}
-
-{{ forms.selectField({
-    label: 'Proof Update Email'|t('print-shop'),
-    id: 'proofEmailUid',
-    name: 'proofEmailUid',
-    options: emailsList,
-    value: settings.proofEmailUid ?? null,
+{{ forms.lightswitchField({
+    label: 'Enable Proofing System'|t('print-shop'),
+    id: 'enableProofs',
+    name: 'enableProofs',
+    on: settings.enableProofs,
+    toggle: 'proofing-settings'
 }) }}
 
-<hr>
+<div id="proofing-settings"{% if not settings.enableProofs %} class="hidden"{% endif %}>
+    <hr>
+    <h2>Proof Settings</h2>
 
-<h2>Proof Statuses</h2>
+    {% set emailsList = [] %}
+    {% for email in commerceEmails %}
+        {% set emailsList = emailsList|merge([{'value': email.uid, 'label': email.name}]) %}
+    {% endfor %}
 
-{% macro statusInput(orderStatuses, currentStatus, prefix) %}
-    <div>
-        <a id="{{ prefix }}-status-menu" class="btn menubtn" href="#">
-            <span class="status {{ currentStatus.color }}"></span>{{ currentStatus.name }}
-        </a>
-        <div class="menu">
-            <ul class="padded">
-                {% for status in orderStatuses %}
-                    <li>
-                        <a data-uid="{{ status.uid }}" data-color="{{ status.color }}" data-name="{{ status.name }}" {% if status.uid == currentStatus.uid %}class="sel"{% endif %} href="#">
-                            <span class="status {{ status.color }}"></span>{{ status.name }}
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
+    {{ forms.selectField({
+        label: 'Proof Update Email'|t('print-shop'),
+        id: 'proofEmailUid',
+        name: 'proofEmailUid',
+        options: emailsList,
+        value: settings.proofEmailUid ?? null,
+    }) }}
+
+    {% macro statusInput(orderStatuses, currentStatus, prefix) %}
+        <div>
+            <a id="{{ prefix }}-status-menu" class="btn menubtn" href="#">
+                <span class="status {{ currentStatus.color }}"></span>{{ currentStatus.name }}
+            </a>
+            <div class="menu">
+                <ul class="padded">
+                    {% for status in orderStatuses %}
+                        <li>
+                            <a data-uid="{{ status.uid }}" data-color="{{ status.color }}" data-name="{{ status.name }}" {% if status.uid == currentStatus.uid %}class="sel"{% endif %} href="#">
+                                <span class="status {{ status.color }}"></span>{{ status.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
-    </div>
-{% endmacro %}
+    {% endmacro %}
 
-{% from _self import statusInput %}
+    {% from _self import statusInput %}
 
-{% set orderStatuses = craft.commerce.orderStatuses.getAllOrderStatuses() %}
+    {% set orderStatuses = craft.commerce.orderStatuses.getAllOrderStatuses() %}
 
-{{ forms.hidden({
-    id: 'proofsSentStatusUid',
-    name: 'proofsSentStatusUid',
-    value: proofsSentStatus.uid
-}) }}
-{{ forms.field({
-    label: 'Proofs Sent'|t('print-shop'),
-}, statusInput(orderStatuses, proofsSentStatus, 'proofsSent')) }}
+    {{ forms.hidden({
+        id: 'proofsSentStatusUid',
+        name: 'proofsSentStatusUid',
+        value: proofsSentStatus.uid
+    }) }}
+    {{ forms.field({
+        label: 'Proofs Sent Status'|t('print-shop'),
+    }, statusInput(orderStatuses, proofsSentStatus, 'proofsSent')) }}
 
-{{ forms.hidden({
-    id: 'proofsApprovedStatusUid',
-    name: 'proofsApprovedStatusUid',
-    value: proofsApprovedStatus.uid
-}) }}
-{{ forms.field({
-    label: 'Proofs Approved'|t('print-shop'),
-}, statusInput(orderStatuses, proofsApprovedStatus, 'proofsApproved')) }}
+    {{ forms.hidden({
+        id: 'proofsApprovedStatusUid',
+        name: 'proofsApprovedStatusUid',
+        value: proofsApprovedStatus.uid
+    }) }}
+    {{ forms.field({
+        label: 'Proofs Approved Status'|t('print-shop'),
+    }, statusInput(orderStatuses, proofsApprovedStatus, 'proofsApproved')) }}
 
-{{ forms.hidden({
-    id: 'proofsRejectedStatusUid',
-    name: 'proofsRejectedStatusUid',
-    value: proofsRejectedStatus.uid
-}) }}
-{{ forms.field({
-    label: 'Proofs Rejected'|t('print-shop'),
-}, statusInput(orderStatuses, proofsRejectedStatus, 'proofsRejected')) }}
+    {{ forms.hidden({
+        id: 'proofsRejectedStatusUid',
+        name: 'proofsRejectedStatusUid',
+        value: proofsRejectedStatus.uid
+    }) }}
+    {{ forms.field({
+        label: 'Proofs Rejected Status'|t('print-shop'),
+    }, statusInput(orderStatuses, proofsRejectedStatus, 'proofsRejected')) }}
 
-
+</div>
 
 {% js %}
     $(function () {
