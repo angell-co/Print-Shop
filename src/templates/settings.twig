@@ -59,6 +59,13 @@
 {% endif %}
 
 {{ forms.lightswitchField({
+    label: 'Show options JSON on Order tab'|t('print-shop'),
+    id: 'showOptionsOnOrderTab',
+    name: 'showOptionsOnOrderTab',
+    on: settings.showOptionsOnOrderTab,
+}) }}
+
+{{ forms.lightswitchField({
     label: 'Enable Proofing System'|t('print-shop'),
     id: 'enableProofs',
     name: 'enableProofs',

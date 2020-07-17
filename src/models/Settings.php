@@ -43,6 +43,11 @@ class Settings extends Model
     public $enableProofs = true;
 
     /**
+     * @var bool
+     */
+    public $showOptionsOnOrderTab = true;
+
+    /**
      * @var string
      */
     public $volumeSubpath;
@@ -79,7 +84,13 @@ class Settings extends Model
 
         return [
             ['volumeUid', 'required'],
-            ['enableProofs', 'boolean'],
+            [
+                [
+                    'enableProofs',
+                    'showOptionsOnOrderTab',
+                ],
+                'boolean'
+            ],
             [
                 [
                     'volumeUid',
