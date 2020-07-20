@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+## 2.4.0 - 2020-07-20
+### Added
+- Added `enableProofs` setting - turn this off to disable the entire proofing process.
+- Added `showAllLineItemsOnOrderTab` setting - turn this off to hide the options JSON list on the Print Shop tab on the Order edit screen.
+- Added `showOptionsOnOrderTab` setting - turn this off to only show line items on the Print Shop tab that have `printShop: true` set in the options JSON.
+
+### Changed
+- Bumped the minimum Commerce requirement to 3.0.0
+
 ## 2.3.2 - 2020-01-06
 ### Fixed
 - Whitelisted the proof and file download actions so they don’t require a login to work

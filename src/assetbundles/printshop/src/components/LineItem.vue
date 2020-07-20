@@ -9,9 +9,9 @@
         <div class="actions">
             <span class="status"
                  :class="{
-                   red: status === 'no proof',
-                   green: status === 'approved',
-                   orange: status === 'rejected'
+                   red: status === 'no proof' && enableProofs,
+                   green: status === 'approved' && enableProofs || status === 'artwork supplied' && !enableProofs,
+                   orange: status === 'rejected' && enableProofs
                  }">
             </span>
             {{ status === 'new' ? 'Pending' : status|capitalize }}
@@ -37,7 +37,7 @@
 
     export default {
         name: 'line-item',
-        props: ['lineItem', 'proofStatus'],
+        props: ['lineItem', 'proofStatus', 'enableProofs'],
         data() {
             return {
                 status: this.proofStatus,
