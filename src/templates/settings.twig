@@ -59,6 +59,13 @@
 {% endif %}
 
 {{ forms.lightswitchField({
+    label: 'Show all line items on Order tab'|t('print-shop'),
+    id: 'showAllLineItemsOnOrderTab',
+    name: 'showAllLineItemsOnOrderTab',
+    on: settings.showAllLineItemsOnOrderTab,
+}) }}
+
+{{ forms.lightswitchField({
     label: 'Show options JSON on Order tab'|t('print-shop'),
     id: 'showOptionsOnOrderTab',
     name: 'showOptionsOnOrderTab',

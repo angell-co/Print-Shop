@@ -12,7 +12,7 @@
             {% for lineItem in order.lineItems %}
 
                 {# First of all check if we should actually be showing this line item #}
-                {% if lineItem.options['printShop'] is defined and lineItem.options['printShop'] %}
+                {% if printShopSettings.showAllLineItemsOnOrderTab or (lineItem.options['printShop'] is defined and lineItem.options['printShop']) %}
 
                     {# Get the customer file #}
                     {% set file = craft.printShop.getFile(lineItem.id) %}

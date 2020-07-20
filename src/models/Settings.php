@@ -45,6 +45,11 @@ class Settings extends Model
     /**
      * @var bool
      */
+    public $showAllLineItemsOnOrderTab = true;
+
+    /**
+     * @var bool
+     */
     public $showOptionsOnOrderTab = true;
 
     /**
