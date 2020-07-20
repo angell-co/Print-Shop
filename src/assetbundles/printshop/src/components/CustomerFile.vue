@@ -1,7 +1,5 @@
 <template>
     <div>
-        <h3>Customer File</h3>
-
         <slot name="AssetSelectInput"></slot>
 
         <div class="btngroup">
