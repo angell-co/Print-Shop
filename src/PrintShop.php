@@ -81,19 +81,22 @@ class PrintShop extends Plugin
         self::$plugin = $this;
         self::$commerce = Commerce::getInstance();
 
-
         // Hook in to the order edit page
         Craft::$app->view->hook('cp.commerce.order.edit', function(array &$context) {
-            $context['tabs'][] = [
-                'label' => Craft::t('print-shop', 'Print Shop'),
-                'url' => '#printShopTab',
-                'class' => null
-            ];
+            if ($display = $this->_shouldOrderTabDisplay($context)) {
+                $context['tabs'][] = [
+                    'label' => Craft::t('print-shop', 'Print Shop'),
+                    'url' => '#printShopTab',
+                    'class' => null
+                ];
+            }
         });
         Craft::$app->view->hook('cp.commerce.order.edit.main-pane', function(array &$context) {
-            Craft::$app->view->registerAssetBundle("angellco\\printshop\\assetbundles\\printshop\\PrintShopAsset");
-            $context['printShopSettings'] = $this->getSettings();
-            return Craft::$app->view->renderTemplate('print-shop/orders/_edit-pane', $context);
+            if ($display = $this->_shouldOrderTabDisplay($context)) {
+                Craft::$app->view->registerAssetBundle("angellco\\printshop\\assetbundles\\printshop\\PrintShopAsset");
+                $context['printShopSettings'] = $this->getSettings();
+                return Craft::$app->view->renderTemplate('print-shop/orders/_edit-pane', $context);
+            }
         });
 
         // Register the proofing status attribute for the order index
@@ -167,6 +170,34 @@ class PrintShop extends Plugin
             __METHOD__
         );
 
+    }
+
+    // Private Methods
+    // =========================================================================
+    /**
+     * @return bool
+     * @throws \Throwable
+     * @throws \craft\errors\ElementNotFoundException
+     * @throws \yii\base\Exception
+     */
+    private function _shouldOrderTabDisplay($context)
+    {
+        $shouldDisplay = (bool) $this->getSettings()->showAllLineItemsOnOrderTab;
+
+
+        if (!$shouldDisplay) {
+            foreach ($context['order']->getLineItems() as $lineItem) {
+
+                $options = $lineItem->getOptions();
+
+                if (isset($options['printShop']) && $options['printShop']) {
+                    $shouldDisplay = true;
+                    continue;
+                }
+            }
+        }
+
+        return $shouldDisplay;
     }
 
     // Protected Methods

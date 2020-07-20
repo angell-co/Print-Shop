@@ -1,12 +1,11 @@
 {# @var craft \craft\web\twig\variables\CraftVariable #}
 {% import "_includes/forms" as forms %}
 
+{% if order.lineItems | length or order.totalPrice > 0 %}
 </div>
 
 <div id="printShopTab" class="hidden">
-
     <div id="printshop">
-        {% if order.lineItems | length or order.totalPrice > 0 %}
         <div class="order-details">
 
             {% for lineItem in order.lineItems %}
@@ -130,7 +129,6 @@
                 {% endif %}
             {% endfor %}
         </div>
-        {% endif %}
     </div>
 
     {% js %}
@@ -146,3 +144,5 @@
             vertical-align: top;
         }
     {% endcss %}
+
+{% endif %}
