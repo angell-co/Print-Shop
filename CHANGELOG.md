@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## Unreleased
 
+## 2.4.1 - 2021-05-19
+### Fixed
+- Fixed a PSR-4 autoloading issue
+
 ## 2.4.0 - 2020-07-20
 ### Added
 - Added `enableProofs` setting - turn this off to disable the entire proofing process.
