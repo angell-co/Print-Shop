@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2019 Angell & Co
  */
 
-namespace angellco\printshop\assetbundles\PrintShop;
+namespace angellco\printshop\assetbundles\printshop;
 
 use Craft;
 use craft\web\AssetBundle;
